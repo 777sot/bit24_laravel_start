@@ -48,3 +48,15 @@ services:
       - 8101:3306
     command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
     container_name: btx_db
+
+  phpmyadmin:
+      image: phpmyadmin/phpmyadmin
+      container_name: "dev_phpmyadmin"
+      restart: always
+      ports:
+          - 9090:80
+      environment:
+          PMA_HOST: db
+          PMA_PORT: 3306
+      depends_on:
+          - db

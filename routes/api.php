@@ -19,6 +19,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-Route::get('/', function (){
-    return 111;
-});
+Route::post('/rules', [\App\Http\Controllers\Api\LeadsController::class, 'rules']);
+Route::post('/addrules/leads/{type}', [\App\Http\Controllers\Api\LeadsController::class, 'addrules'])->name('addrules.leads');

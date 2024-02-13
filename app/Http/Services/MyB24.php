@@ -24,19 +24,17 @@ class MyB24
     }
 
     /**
-     * @var $arSettings array settings application
-     * @var $isInstall  boolean true if install app by installApp()
      * @return boolean
+     * @var $isInstall  boolean true if install app by installApp()
+     * @var $arSettings array settings application
      */
 
     private static function setAppSettings($arSettings, $isInstall = false)
     {
         $return = false;
-        if(is_array($arSettings))
-        {
+        if (is_array($arSettings)) {
             $oldData = static::getAppSettings();
-            if($isInstall != true && !empty($oldData) && is_array($oldData))
-            {
+            if ($isInstall != true && !empty($oldData) && is_array($oldData)) {
                 $arSettings = array_merge($oldData, $arSettings);
             }
             $return = static::setSettingData($arSettings);
@@ -47,29 +45,27 @@ class MyB24
     /**
      * Can overridden this method to change the data storage location.
      *
-     * @var $arSettings array settings application
      * @return boolean is successes save data for setSettingData()
+     * @var $arSettings array settings application
      */
 
     protected static function setSettingData($arSettings)
     {
-        return  (boolean)file_put_contents(__DIR__ . '/settings.json', static::wrapData($arSettings));
+        return (boolean)file_put_contents(__DIR__ . '/settings.json', static::wrapData($arSettings));
     }
 
     /**
-     * @var $data mixed
+     * @return string json_encode with encoding
      * @var $debag boolean
      *
-     * @return string json_encode with encoding
+     * @var $data mixed
      */
     protected static function wrapData($data, $debag = false)
     {
-        if(defined(env('C_REST_CURRENT_ENCODING')))
-        {
+        if (defined(env('C_REST_CURRENT_ENCODING'))) {
             $data = static::changeEncoding($data, true);
         }
-        $return = json_encode($data, JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT);
-
+        $return = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
 
         return $return;
@@ -81,32 +77,29 @@ class MyB24
 
     private static function getAppSettings()
     {
-        if(defined(env("C_REST_WEB_HOOK_URL")) && !empty(env("C_REST_WEB_HOOK_URL")))
-        {
+        if (defined(env("C_REST_WEB_HOOK_URL")) && !empty(env("C_REST_WEB_HOOK_URL"))) {
             $arData = [
                 'client_endpoint' => env("C_REST_WEB_HOOK_URL"),
-                'is_web_hook'     => 'Y'
+                'is_web_hook' => 'Y'
             ];
             $isCurrData = true;
-        }
-        else
-        {
+        } else {
             $arData = static::getSettingData();
             $isCurrData = false;
-            if(
-                !empty($arData[ 'access_token' ]) &&
-                !empty($arData[ 'domain' ]) &&
-                !empty($arData[ 'refresh_token' ]) &&
-                !empty($arData[ 'application_token' ]) &&
-                !empty($arData[ 'client_endpoint' ])
-            )
-            {
+            if (
+                !empty($arData['access_token']) &&
+                !empty($arData['domain']) &&
+                !empty($arData['refresh_token']) &&
+                !empty($arData['application_token']) &&
+                !empty($arData['client_endpoint'])
+            ) {
                 $isCurrData = true;
             }
         }
 
         return ($isCurrData) ? $arData : false;
     }
+
     static function getCallB24(Request $request, $method, $type = 'json')
     {
         $domain = $request->input('DOMAIN');
@@ -123,7 +116,83 @@ class MyB24
 
         return $response->json();
     }
-     static function setCallB24(Request $request, $method, $data)
+    static function getLeadCallB24(Request $request, $method, $id)
+    {
+        $domain = $request->input('DOMAIN');
+        $auth_id = $request->input('AUTH_ID');
+        $url = 'https://' . $domain . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $auth_id,
+            'ID' => $id
+        ]);
+
+        return $response->json();
+    }
+
+    static function getCallB24config(Request $request, $method)
+    {
+        $domain = $request->input('DOMAIN');
+        $auth_id = $request->input('AUTH_ID');
+        //  $method = 'crm.company.list';
+        $url = 'https://' . $domain . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $auth_id,
+            "scope" => "P",
+            "data" =>
+                [
+                    [
+                        "name" => "main",
+                        "title" => "Общие сведения 1",
+                        "type" => "section",
+                        "elements" =>
+                            [
+                                ["name" => "TITLE"],
+                                ["name" => "STATUS_ID"],
+                                ["name" => "NAME"],
+                                ["name" => "BIRTHDATE"],
+                                ["name" => "POST"],
+                                ["name" => "PHONE"],
+                                ["name" => "EMAIL"]
+                            ]
+                    ],
+                    [
+                        "name" => "additional",
+                        "title" => "Дополнительно",
+                        "type" => "section",
+                        "elements" =>
+                            [
+                                ["name" => "SOURCE_ID"],
+                                ["name" => "SOURCE_DESCRIPTION"],
+                                ["name" => "OPENED"],
+                                ["name" => "ASSIGNED_BY_ID"],
+                                ["name" => "ASSIGNED_BY_ID"],
+                                ["name" => "OBSERVER"],
+                                ["name" => "COMMENTS"]
+                            ]
+                    ],
+                ],
+        ]);
+
+
+        return $response->json();
+    }
+
+    static function getCallB24configReset(Request $request, $method)
+    {
+        $domain = $request->input('DOMAIN');
+        $auth_id = $request->input('AUTH_ID');
+        //  $method = 'crm.company.list';
+        $url = 'https://' . $domain . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $auth_id,
+            "scope" => "P",
+        ]);
+
+
+        return $response->json();
+    }
+
+    static function setCallB24(Request $request, $method, $data)
     {
         $domain = $request->input('DOMAIN');
         $auth_id = $request->input('AUTH_ID');
@@ -143,6 +212,7 @@ class MyB24
 
         return $response->json();
     }
+
     static function setLeadsCallB24(Request $request, $method)
     {
         $domain = $request->input('DOMAIN');
@@ -159,8 +229,26 @@ class MyB24
 
         return $response->json();
     }
+    static function setLeadsCallB24_test(Request $request, $method)
+    {
+        $domain = $request->input('auth.domain');
+        $auth_id = $request->input('auth.access_token');
+        $id = $request->input('data.FIELDS.ID');
 
-    static function placementCallB24(Request $request, $method)
+        $url = 'https://' . $domain . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $auth_id,
+            "id" => $id,
+            'fields' => [
+                'TITLE' => "New Test - ".$id,
+                "NAME" => "NAME"
+            ]
+        ]);
+
+        return $response->json();
+    }
+
+    static function placementCallB24upd(Request $request, $method)
     {
         $domain = $request->input('DOMAIN');
         $auth_id = $request->input('AUTH_ID');
@@ -173,12 +261,51 @@ class MyB24
             'HANDLER' => "https://bitb24.ru/placement",
             'TITLE' => 'bitb24',
             'OPTIONS' => [
+                'height' => 100,
+            ]
+        ]);
+
+        return $response;
+
+    }
+
+    static function placementCallB24(Request $request, $method)
+    {
+        $domain = $request->input('DOMAIN');
+        $auth_id = $request->input('AUTH_ID');
+
+        $url = 'https://' . $domain . '/rest/' . $method . '.json';
+
+        $response = Http::post($url,
+            [
+            'auth' => $auth_id,
+            'USER_TYPE_ID' => 'my_custom_type',
+            'HANDLER' => "https://bitb24.ru/placement",
+            'TITLE' => 'bitb24',
+            'OPTIONS' => [
                 'height' => 600,
             ]
         ]);
 
         return $response;
 
+    }
+
+    static function bindCallB24(Request $request, $method, $event){
+        $domain = $request->input('DOMAIN');
+        $auth_id = $request->input('AUTH_ID');
+
+        $url = 'https://' . $domain . '/rest/' . $method . '.json';
+
+        $response = Http::post($url,
+            [
+                'auth' => $auth_id,
+                'EVENT' => $event,
+                'HANDLER' => "https://bitb24.ru/handler",
+                'EVENT_TYPE' => 'online'
+            ]);
+
+        return $response;
     }
 
     public static function installApp(Request $request)
@@ -196,12 +323,9 @@ class MyB24
             'install' => false
         ];
 
-        if($event == 'ONAPPINSTALL' && !empty($auth_id))
-        {
+        if ($event == 'ONAPPINSTALL' && !empty($auth_id)) {
             $result['install'] = static::setAppSettings($auth_id, true);
-        }
-        elseif($plasement == 'DEFAULT')
-        {
+        } elseif ($plasement == 'DEFAULT') {
             $result['rest_only'] = false;
             $result['install'] = static::setAppSettings(
                 [
