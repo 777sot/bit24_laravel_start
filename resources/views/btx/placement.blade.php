@@ -13,11 +13,11 @@
         <form method="POST" class="w-full max-w-sm space-y-8" action="{{ route('leads') }}">
 @foreach($fields as $k => $field)
                <div class="mt-2">
-                   <label for="{{$field->TITLE}}" class="block text-sm font-medium leading-6 text-gray-900">{{$field->id}} {{$field->TITLE}}</label>
+                   <label for="{{$field->FIELD_NAME}}" class="block text-sm font-medium leading-6 text-gray-900">{{$field->id}} {{$field->FIELD_NAME}}</label>
 
-                   <input data-id="{{$field->id}}" type="text" name="{{$field->TITLE}}" id="{{$field->TITLE}}"
+                   <input data-id="{{$field->id}}" type="text" name="{{$field->FIELD_NAME}}" id="{{$field->FIELD_NAME}}"
                            class="my_frm f{{$k}} block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                   value="{{$field->id}}asdasd{{$field->id}}">
+                   value="">
                 </div>
 @endforeach
 {{--            <label for="TITLE" class="block text-sm font-medium leading-6 text-gray-900">TITLE222</label>--}}
@@ -69,12 +69,12 @@
                     for (key in res.data[k]) {
 
                         // elem.innerHTML = JSON.stringify(res.data[k][key]);
-                        elem.innerHTML = JSON.stringify(key);
-                        if(res.data[k][key]['show'] == 0){
-                            document.querySelector(`.f${key}`).style.display = "none";
-                        }else{
-                            document.querySelector(`.f${key}`).style.display = "block";
-                        }
+                        // elem.innerHTML = JSON.stringify(key);
+                        // if(res.data[k][key]['show'] == 0){
+                        //     document.querySelector(`.f${key}`).style.display = "none";
+                        // }else{
+                        //     document.querySelector(`.f${key}`).style.display = "block";
+                        // }
 
                     }
 

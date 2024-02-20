@@ -2,12 +2,14 @@
 
 namespace App\Http\Services;
 
+use App\Models\Field;
 use App\Models\Rule;
 
 class ApiServices
 {
 
-    static public function ruleAdd($request, $type){
+    static public function ruleAdd($request, $type)
+    {
 
         if($type == 1){
 
@@ -33,6 +35,26 @@ class ApiServices
             return json_encode($request->input());
         }
 
+
+        return $field;
+    }
+
+    static public function fileldAdd($data){
+
+//        $data['FIELD_NAME'] = $request->input('FIELD_NAME');
+//        $data['CRM_TYPE'] = $request->input('CRM_TYPE');
+//        $data['EDIT_FORM_LABEL'] = $request->input('EDIT_FORM_LABEL');
+//        $data['LIST_COLUMN_LABEL'] = $request->input('LIST_COLUMN_LABEL');
+//        $data['USER_TYPE_ID'] = $request->input('USER_TYPE_ID');
+//        $data['XML_ID'] = $request->input('XML_ID');
+//        $data['LIST'] = $request->input('LIST');
+//        $data['SETTINGS'] = $request->input('SETTINGS');
+
+
+            $field = Field::firstOrCreate([
+                'FIELD_NAME' => $data['FIELD_NAME'],
+                'CRM_TYPE' => $data['CRM_TYPE'],
+            ], $data);
 
         return $field;
     }

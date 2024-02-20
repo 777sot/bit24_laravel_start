@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Services\FieldsBTX;
 use App\Http\Services\MyB24;
 use App\Http\Services\Services;
 use App\Models\Field;
@@ -15,15 +16,20 @@ class IndexController extends Controller
 
     public function index(Request $request)
     {
-        $fields_CRM_LEAD = Services::refreshCRM_LEADfields($request);
-        $fields_CRM_DEAL = Services::refreshCRM_DEALfields($request);
-        $fields_CRM_CONTACT = Services::refreshCRM_CONTACTfields($request);
-        $fields_CRM_COMPANY = Services::refreshCRM_COMPANYfields($request);
-        $fields_CRM_QUOTE = Services::refreshCRM_QUOTEfields($request);
+//        $fields_CRM_LEAD = Services::refreshCRM_LEADfields($request);
+//        $fields_CRM_DEAL = Services::refreshCRM_DEALfields($request);
+//        $fields_CRM_CONTACT = Services::refreshCRM_CONTACTfields($request);
+//        $fields_CRM_COMPANY = Services::refreshCRM_COMPANYfields($request);
+//        $fields_CRM_QUOTE = Services::refreshCRM_QUOTEfields($request);
 
-        $result = MyB24::getCallB24configReset($request, 'crm.lead.details.configuration.reset');
-        $result = MyB24::getCallB24config($request, 'crm.lead.details.configuration.set');
+//        $result = MyB24::getCallB24configReset($request, 'crm.lead.details.configuration.reset');
+//        $result = MyB24::getCallB24config($request, 'crm.lead.details.configuration.set');
 
+        $result1 = FieldsBTX::AddTextField($request);
+        $result2 = FieldsBTX::AddListField($request);
+
+        dump($result1);
+        dd($result2);
 
 
         Log::info("INDEX");
@@ -163,17 +169,17 @@ class IndexController extends Controller
     public function placement(Request $request)
     {
         $result = MyB24::placementCallB24upd($request, 'userfieldtype.update');
-        $result = MyB24::getCallB24configReset($request, 'crm.contact.details.configuration.reset');
-        $result = MyB24::getCallB24config($request, 'crm.lead.details.configuration.set');
+//        $result = MyB24::getCallB24configReset($request, 'crm.contact.details.configuration.reset');
+//        $result = MyB24::getCallB24config($request, 'crm.lead.details.configuration.set');
 
-        dd($request->input());
+//        dd($request->input());
 
         $domain = $request->input('DOMAIN');
         $auth_id = $request->input('AUTH_ID');
         $id = Services::getLeads($request, 'id');
 
         $fields = Field::all();
-
+//        dd($fields);
         return view('btx.placement', compact('id','fields', 'domain', 'auth_id'));
     }
 }

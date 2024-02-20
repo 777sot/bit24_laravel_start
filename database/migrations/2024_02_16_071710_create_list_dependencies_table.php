@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rules', function (Blueprint $table) {
+        Schema::create('list_dependencies', function (Blueprint $table) {
             $table->id();
-            $table->string('CRM_TYPE');
+            $table->foreignId('list_field_id')->nullable()->index()->constrained('list_fields');
             $table->foreignId('field_id')->nullable()->index()->constrained('fields');
-            $table->text('rule');
-            $table->unsignedSmallInteger('rule_type');
-            $table->boolean('show')->default('1');
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rules');
+        Schema::dropIfExists('list_dependencies');
     }
 };

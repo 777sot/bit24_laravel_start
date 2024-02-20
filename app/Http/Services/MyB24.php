@@ -100,6 +100,17 @@ class MyB24
         return ($isCurrData) ? $arData : false;
     }
 
+    static function CallB24($domain, $auth_id, $method, $data){
+
+        $url = 'https://' . $domain . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $auth_id,
+            'fields' => $data
+        ]);
+
+        return $response->json();
+    }
+
     static function getCallB24(Request $request, $method, $type = 'json')
     {
         $domain = $request->input('DOMAIN');
@@ -261,7 +272,7 @@ class MyB24
             'HANDLER' => "https://bitb24.ru/placement",
             'TITLE' => 'bitb24',
             'OPTIONS' => [
-                'height' => 100,
+                'height' => 600,
             ]
         ]);
 

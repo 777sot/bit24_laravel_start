@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Field extends Model
+class ListField extends Model
 {
     use HasFactory;
 
     protected $guarded = false;
 
-    public function lists()
+    public function field()
     {
-        return $this->hasMany(ListField::class, 'field_id', 'id');
+        return $this->belongsTo(Field::class,'field_id','id');
     }
 }
