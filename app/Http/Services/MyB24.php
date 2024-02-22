@@ -2,6 +2,7 @@
 
 namespace App\Http\Services;
 
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -13,7 +14,7 @@ class MyB24
      * @return array setting for getAppSettings()
      */
 
-    protected static function getSettingData()
+    public static function getSettingData()
     {
         $return = [];
 
@@ -75,7 +76,7 @@ class MyB24
      * @return mixed setting application for query
      */
 
-    private static function getAppSettings()
+    public static function getAppSettings()
     {
         if (defined(env("C_REST_WEB_HOOK_URL")) && !empty(env("C_REST_WEB_HOOK_URL"))) {
             $arData = [
@@ -328,6 +329,7 @@ class MyB24
         $app_sid = $request->input('APP_SID');
         $refresh_id = $request->input('REFRESH_ID');
         $event = $request->input('event');
+        $member_id = $request->input('member_id');
 
         $result = [
             'rest_only' => true,
@@ -349,6 +351,18 @@ class MyB24
                 ],
                 true
             );
+
+            Setting::updateOrCreate([
+                'member_id' => htmlspecialchars($member_id)
+            ],[
+                'member_id' => htmlspecialchars($member_id),
+                'access_token' => htmlspecialchars($auth_id),
+                'expires_in' => htmlspecialchars($auth_exp),
+                'application_token' => htmlspecialchars($app_sid),
+                'refresh_token' => htmlspecialchars($refresh_id),
+                'domain' => htmlspecialchars($domain),
+                'client_endpoint' => 'https://' . htmlspecialchars($domain) . '/rest/',
+            ]);
         }
 
 //        static::setLog(

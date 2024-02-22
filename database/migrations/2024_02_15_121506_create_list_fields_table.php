@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->foreignId('field_id')->nullable()->index()->constrained('fields');
             $table->string('CRM_TYPE');
             $table->string('value');
+            $table->string('member_id')->nullable();
             $table->timestamps();
         });
     }

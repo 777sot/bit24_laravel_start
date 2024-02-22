@@ -36,6 +36,7 @@ return new class extends Migration
             $table->string('LIST')->nullable();
             $table->string('XML_ID');
             $table->text('SETTINGS')->nullable();
+            $table->string('member_id')->nullable();
             $table->timestamps();
         });
     }

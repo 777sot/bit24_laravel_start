@@ -7,6 +7,7 @@ use App\Http\Requests\Api\Leads\Rules\StoreRequest;
 use App\Http\Requests\Api\Leads\Rules\UpdateRequest;
 use App\Http\Resources\Api\Fields\FieldResource;
 use App\Http\Resources\Api\Fields\RuleResource;
+use App\Http\Services\Services;
 use App\Models\Field;
 use App\Models\Rule;
 use Illuminate\Http\Request;
@@ -280,5 +281,27 @@ class RulesController extends Controller
                 'messages' => 'Rule is not found',
             ]);
         }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function check_rules(Request $request)
+    {
+        $data = $request->input();
+
+        foreach ($data as $field_id => $value) {
+
+            $field = Field::find($field_id);
+
+            if (!$field) {
+                return array('data' => [
+                    'status' => false,
+                    'messages' => "field_id = $field_id is not found",
+                ]);
+            }
+        }
+
+        return Services::checkLeadsFields($request);
     }
 }

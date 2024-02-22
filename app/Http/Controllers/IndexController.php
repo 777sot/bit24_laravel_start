@@ -16,6 +16,8 @@ class IndexController extends Controller
 
     public function index(Request $request)
     {
+
+//        dd($request->input());
 //        $fields_CRM_LEAD = Services::refreshCRM_LEADfields($request);
 //        $fields_CRM_DEAL = Services::refreshCRM_DEALfields($request);
 //        $fields_CRM_CONTACT = Services::refreshCRM_CONTACTfields($request);
@@ -28,8 +30,8 @@ class IndexController extends Controller
         $result1 = FieldsBTX::AddTextField($request);
         $result2 = FieldsBTX::AddListField($request);
 
-        dump($result1);
-        dd($result2);
+//        dump($result1);
+//        dd($result2);
 
 
         Log::info("INDEX");

@@ -22,9 +22,51 @@
 
 
 
-
+    <script src="//api.bitrix24.com/api/v1/"></script>
     <script>
         window.onload = function () {
+
+
+            let data = qs.stringify({
+                'LIST_COLUMN_LABEL': 'новый список 333',
+                'LIST': '[ { "VALUE": "Элемент #12" }, { "VALUE": "Элемент #23" }, { "VALUE": "Элемент #3" }, { "VALUE": "Элемент #4" }, { "VALUE": "Элемент #5" } ]',
+                'USER_TYPE_ID': 'enumeration',
+                'MULTIPLE': '1'
+            });
+
+            let config = {
+                method: 'post',
+                maxBodyLength: Infinity,
+                url: 'https://bitb24.ru/api/leads/fields/',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                data : data
+            };
+
+            axios.request(config)
+                .then((response) => {
+                    console.log(JSON.stringify(response.data));
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+
+
+            console.log(BX24.getAuth());
+
+            BX24.callMethod(
+                "user.current",
+                {},
+                function(result)
+                {
+                    if(result.error())
+                        console.error(result.error());
+                    else
+                        console.dir(result.data());
+                }
+            );
+
 
             axios.post('/api/rules')
                 .then(res => {

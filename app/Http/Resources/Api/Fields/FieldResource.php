@@ -21,6 +21,7 @@ class FieldResource extends JsonResource
             'LIST_COLUMN_LABEL' => $this->LIST_COLUMN_LABEL,
             'USER_TYPE_ID' => $this->USER_TYPE_ID,
             'MULTIPLE' => $this->MULTIPLE,
+            'index' => $this->index,
             "LIST" => ($this->USER_TYPE_ID === "enumeration") ? ListResource::collection($this->lists) : 0
         ];
     }

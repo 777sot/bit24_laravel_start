@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rules', function (Blueprint $table) {
+        Schema::create('settings', function (Blueprint $table) {
             $table->id();
-            $table->string('CRM_TYPE');
-            $table->foreignId('field_id')->nullable()->index()->constrained('fields');
-            $table->text('rule');
-            $table->unsignedSmallInteger('rule_type');
-            $table->boolean('show')->default('1');
-            $table->string('member_id')->nullable();
+            $table->string('member_id')->unique();
+            $table->string('access_token');
+            $table->string('expires_in');
+            $table->string('application_token');
+            $table->string('refresh_token');
+            $table->string('domain');
+            $table->string('client_endpoint');
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rules');
+        Schema::dropIfExists('settings');
     }
 };

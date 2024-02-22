@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Services\ApiServices;
+use App\Http\Services\MyB24;
 use App\Http\Services\Services;
 use App\Models\Rule;
 use Illuminate\Http\Request;
@@ -19,16 +20,9 @@ class LeadsController extends Controller
     }
     public function test(Request $request)
     {
-        $data = $request->input();
+//        $data = $request->input();
 
-        if(empty($data['LIST'])){
-            return 222;
-        }
-      //  $data = json_decode($data['LIST']);
-        foreach ($data as $v){
-           // return $v->VALUE;
-        }
-
+       $data = MyB24::getAppSettings();
         return $data;
 
     }

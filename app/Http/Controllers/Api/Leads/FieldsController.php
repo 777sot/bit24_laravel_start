@@ -8,6 +8,7 @@ use App\Http\Requests\Api\Leads\Fields\UpdateRequest;
 use App\Http\Resources\Api\Fields\FieldResource;
 use App\Models\Field;
 use App\Models\ListField;
+use App\Models\Rule;
 use Illuminate\Http\Request;
 
 class FieldsController extends Controller
@@ -26,7 +27,6 @@ class FieldsController extends Controller
      */
     public function store(StoreRequest $request)
     {
-
         $data = $request->validated();
         $field_name = mb_strtoupper($data['USER_TYPE_ID']);
         $field = Field::where('FIELD_NAME', 'LIKE', "%{$field_name}%")
@@ -52,7 +52,10 @@ class FieldsController extends Controller
         ], $data);
 
         if ($data['USER_TYPE_ID'] == "enumeration" && !empty($data['LIST'])) {
+
             $lists = json_decode($data['LIST']);
+//            $lists = $data['LIST'];
+
             foreach ($lists as $list) {
                 if(!isset($list->VALUE)){
                     return array('data' =>
@@ -148,15 +151,38 @@ class FieldsController extends Controller
      */
     public function destroy(string $id)
     {
-
         $field = Field::find($id);
 
         if ($field) {
+
+            $rules = Rule::all();
+
+            foreach ($rules as $rule){
+                if($rule->field_id == $id){
+                    $rule->delete();
+                    continue;
+                }
+                $rule_arr =  json_decode($rule->rule);
+                $new_rule = array();
+                foreach ($rule_arr as $value){
+                    if ($value->id == $id){
+                        continue;
+                    }else{
+                        $new_rule[] = $value;
+                    }
+                }
+                $rule->update([
+                    'rule' => json_encode($new_rule)
+                ]);
+            }
+
             $field->lists()->delete();
             $field->delete();
+
+
             return array('data' => [
                 'status' => true,
-                'messages' => 'Dependency is deleted',
+                'messages' => 'Field is deleted',
             ]);
         } else {
             return array('data' => [
@@ -164,5 +190,51 @@ class FieldsController extends Controller
                 'messages' => 'Field is not found',
                 ]);
         }
+    }
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function update_index(Request $request)
+    {
+        $data = $request->input();
+
+        if(empty($data['index'])){
+
+            return array('data' => [
+                'status' => false,
+                'messages' => "index is empty",
+            ]);
+        }
+
+        $indexs = json_decode($data['index']);
+
+        $count_fields = Field::where('CRM_TYPE', "CRM_LEAD")->count();
+
+        if($count_fields != count($indexs)){
+            return array('data' => [
+                'status' => false,
+                'messages' => "The number of fields is not equal to the number of indexes",
+            ]);
+        }
+
+        foreach ($indexs as $index){
+
+            $field = Field::find($index->field_id);
+
+            if(!$field){
+                return array('data' => [
+                    'status' => false,
+                    'messages' => "Field ID = $index->field_id is not found",
+                ]);
+            }
+
+            $field->update([
+                'index' => $index->index
+            ]);
+        }
+
+        $fields = Field::where('CRM_TYPE', "CRM_LEAD")->get();
+
+        return FieldResource::collection($fields);
     }
 }
