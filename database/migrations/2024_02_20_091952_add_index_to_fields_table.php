@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('fields', function (Blueprint $table) {
-            $table->string('default')->nullable();
-            $table->unsignedSmallInteger('index')->nullable();
+//            $table->string('default')->nullable();
+//            $table->unsignedSmallInteger('index')->nullable();
         });
     }
 
@@ -23,8 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('fields', function (Blueprint $table) {
-            $table->dropColumn('default');
-            $table->dropColumn('index');
+//            $table->dropColumn('default');
+//            $table->dropColumn('index');
         });
     }
 };

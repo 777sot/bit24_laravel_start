@@ -33,9 +33,11 @@ class UpdateRequest extends FormRequest
     {
         return [
             'LIST_COLUMN_LABEL' => 'required|string',
-            'USER_TYPE_ID' => 'string',
+            'USER_TYPE_ID' => 'required|string',
+            'SETTINGS' => 'string',
             'LIST' => 'string',
             'MULTIPLE' => 'string|boolean',
+            'member_id' => 'required|string|exists:App\Models\Setting,member_id',
         ];
     }
 
@@ -48,6 +50,7 @@ class UpdateRequest extends FormRequest
             'USER_TYPE_ID.string' => 'A USER_TYPE_ID is string',
             'SETTINGS.string' => 'A SETTINGS is string',
             'LIST.string' => 'A LIST is string',
+            'member_id.string' => 'A member_id must be string',
             'MULTIPLE.string' => 'A MULTIPLE must be 0 or 1',
             'MULTIPLE.boolean' => 'A MULTIPLE must be 0 or 1',
         ];

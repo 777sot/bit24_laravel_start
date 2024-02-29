@@ -22,6 +22,7 @@ class FieldResource extends JsonResource
             'USER_TYPE_ID' => $this->USER_TYPE_ID,
             'MULTIPLE' => $this->MULTIPLE,
             'index' => $this->index,
+            'member_id' => $this->member_id,
             "LIST" => ($this->USER_TYPE_ID === "enumeration") ? ListResource::collection($this->lists) : 0
         ];
     }

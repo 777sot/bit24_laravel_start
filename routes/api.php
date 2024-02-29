@@ -196,7 +196,7 @@ Route::get('/help/rule_type', [\App\Http\Controllers\Api\Help\HelpController::cl
 
 
 
-Route::post('/test', [\App\Http\Controllers\Api\LeadsController::class, 'test'])->name('test.leads');
+Route::get('/qwe', [\App\Http\Controllers\Api\LeadsController::class, 'test'])->name('test.leads');
 
 Route::post('/rules', [\App\Http\Controllers\Api\LeadsController::class, 'rules'])->name('rules.leads');
 //ДОБАВЛЕНИЕ ПРАВИЛА ДЛЯ ЛИДА

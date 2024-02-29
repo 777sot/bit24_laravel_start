@@ -19,6 +19,7 @@ class RuleResource extends JsonResource
             'id' => $this->id,
             'field_id' => $this->field_id,
             'rule' => json_decode($this->rule),
+            'member_id' => $this->member_id,
         ];
     }
 }

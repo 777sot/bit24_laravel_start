@@ -22,8 +22,8 @@ class LeadsController extends Controller
     {
 //        $data = $request->input();
 
-       $data = MyB24::getAppSettings();
-        return $data;
+//       $data = MyB24::getAppSettings();
+        return 111;
 
     }
 

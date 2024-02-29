@@ -14,6 +14,11 @@ class RuleResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'status' => true,
+            'id' => $this->id,
+            'field_id' => $this->field_id,
+            'rule' => json_decode($this->rule),
+        ];
     }
 }

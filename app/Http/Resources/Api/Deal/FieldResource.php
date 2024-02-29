@@ -14,6 +14,16 @@ class FieldResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'status' => true,
+            'id' => $this->id,
+            'CRM_TYPE' => $this->CRM_TYPE,
+            'LIST_COLUMN_LABEL' => $this->LIST_COLUMN_LABEL,
+            'USER_TYPE_ID' => $this->USER_TYPE_ID,
+            'MULTIPLE' => $this->MULTIPLE,
+            'index' => $this->index,
+            'member_id' => $this->member_id,
+            "LIST" => ($this->USER_TYPE_ID === "enumeration") ? ListResource::collection($this->lists) : 0
+        ];
     }
 }

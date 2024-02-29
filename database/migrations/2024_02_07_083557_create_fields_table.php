@@ -36,7 +36,11 @@ return new class extends Migration
             $table->string('LIST')->nullable();
             $table->string('XML_ID');
             $table->text('SETTINGS')->nullable();
+            $table->string('default')->nullable();
+            $table->string('value')->nullable();
+            $table->unsignedSmallInteger('index')->nullable();
             $table->string('member_id')->nullable();
+            $table->unsignedSmallInteger('BTX_ID')->nullable();
             $table->timestamps();
         });
     }

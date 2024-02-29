@@ -101,7 +101,8 @@ class MyB24
         return ($isCurrData) ? $arData : false;
     }
 
-    static function CallB24($domain, $auth_id, $method, $data){
+    static function CallB24($domain, $auth_id, $method, $data)
+    {
 
         $url = 'https://' . $domain . '/rest/' . $method . '.json';
         $response = Http::post($url, [
@@ -128,6 +129,7 @@ class MyB24
 
         return $response->json();
     }
+
     static function getLeadCallB24(Request $request, $method, $id)
     {
         $domain = $request->input('DOMAIN');
@@ -241,6 +243,7 @@ class MyB24
 
         return $response->json();
     }
+
     static function setLeadsCallB24_test(Request $request, $method)
     {
         $domain = $request->input('auth.domain');
@@ -252,7 +255,7 @@ class MyB24
             'auth' => $auth_id,
             "id" => $id,
             'fields' => [
-                'TITLE' => "New Test - ".$id,
+                'TITLE' => "New Test - " . $id,
                 "NAME" => "NAME"
             ]
         ]);
@@ -269,8 +272,8 @@ class MyB24
 
         $response = Http::post($url, [
             'auth' => $auth_id,
-            'USER_TYPE_ID' => 'my_custom_type',
-            'HANDLER' => "https://bitb24.ru/placement",
+            'USER_TYPE_ID' => 'bitb24_custom_type',
+            'HANDLER' => "https://bitb24.ru/placement/",
             'TITLE' => 'bitb24',
             'OPTIONS' => [
                 'height' => 600,
@@ -279,6 +282,23 @@ class MyB24
 
         return $response;
 
+    }
+
+    static function placementCallB24_delete(Request $request, $method)
+    {
+        $domain = $request->input('DOMAIN');
+        $auth_id = $request->input('AUTH_ID');
+
+
+        $url = 'https://' . $domain . '/rest/' . $method . '.json';
+
+
+        $response = Http::post($url,
+            [
+                'auth' => $auth_id,
+                'USER_TYPE_ID' => 'bitb24_custom_type_1',
+            ]);
+        return $response;
     }
 
     static function placementCallB24(Request $request, $method)
@@ -288,22 +308,40 @@ class MyB24
 
         $url = 'https://' . $domain . '/rest/' . $method . '.json';
 
+
         $response = Http::post($url,
             [
-            'auth' => $auth_id,
-            'USER_TYPE_ID' => 'my_custom_type',
-            'HANDLER' => "https://bitb24.ru/placement",
-            'TITLE' => 'bitb24',
-            'OPTIONS' => [
-                'height' => 600,
-            ]
-        ]);
-
+                'auth' => $auth_id,
+                'USER_TYPE_ID' => 'bitb24_custom_type',
+                'HANDLER' => "https://bitb24.ru/laravel/placement/",
+                'TITLE' => 'bitb24',
+                'OPTIONS' => [
+                    'height' => 600,
+                ]
+            ]);
         return $response;
 
     }
 
-    static function bindCallB24(Request $request, $method, $event){
+    static function placementCallB24_list(Request $request, $method)
+    {
+        $domain = $request->input('DOMAIN');
+        $auth_id = $request->input('AUTH_ID');
+
+        $url = 'https://' . $domain . '/rest/' . $method . '.json';
+
+
+        $response = Http::post($url,
+            [
+                'auth' => $auth_id,
+//                'USER_TYPE_ID' => 'bitb24_custom_type1'
+            ]);
+        return $response;
+
+    }
+
+    static function bindCallB24(Request $request, $method, $event)
+    {
         $domain = $request->input('DOMAIN');
         $auth_id = $request->input('AUTH_ID');
 
@@ -354,7 +392,7 @@ class MyB24
 
             Setting::updateOrCreate([
                 'member_id' => htmlspecialchars($member_id)
-            ],[
+            ], [
                 'member_id' => htmlspecialchars($member_id),
                 'access_token' => htmlspecialchars($auth_id),
                 'expires_in' => htmlspecialchars($auth_exp),
@@ -373,5 +411,575 @@ class MyB24
 //            'installApp'
 //        );
         return $result;
+    }
+
+    static function CallB24_field_text_add(Request $request, $crm_type, $add = [])
+    {
+        $data = $request->input();
+
+        $method = '';
+
+        switch ($crm_type) {
+            case "CRM_LEAD":
+                $method = "crm.lead.userfield.add";
+                break;
+            case "CRM_COMPANY":
+                $method = "crm.company.userfield.add";
+                break;
+            case "CRM_CONTACT":
+                $method = "crm.contact.userfield.add";
+                break;
+            case "CRM_DEAL":
+                $method = "crm.deal.userfield.add";
+                break;
+            case "CRM_QUOTE":
+                $method = "crm.quote.userfield.add";
+                break;
+        }
+        if (!$method) {
+            return false;
+        }
+
+
+        $url = 'https://' . $data['DOMAIN'] . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $data['AUTH_ID'],
+            'fields' => [
+                "FIELD_NAME" => $add["FIELD_NAME"],
+                "EDIT_FORM_LABEL" => $add["EDIT_FORM_LABEL"],
+                "LIST_COLUMN_LABEL" => $add["LIST_COLUMN_LABEL"],
+                "USER_TYPE_ID" => $add["USER_TYPE_ID"],
+                "XML_ID" => $add["XML_ID"],
+//                "SETTINGS" => ["DEFAULT_VALUE" => "Привет, мир!"],
+            ]
+        ]);
+
+        return $response->json();
+    }
+
+    static function CallB24_refresh_token($member_id)
+    {
+        $member = Setting::where('member_id', $member_id)->first();
+
+        if (!$member) {
+            return false;
+        }
+
+        $url = 'https://oauth.bitrix.info/oauth/token/';
+        $response = Http::get($url, [
+            'grant_type' => 'refresh_token',
+            'client_id' => env('C_REST_CLIENT_ID'),
+            'client_secret' => env('C_REST_CLIENT_SECRET'),
+            'refresh_token' => $member->refresh_token,
+        ]);
+
+        $result = $response->json();
+
+        if (!isset($result['access_token'])) {
+            return false;
+        }
+
+        unset($result['expires']);
+        unset($result['scope']);
+        unset($result['server_endpoint']);
+        unset($result['status']);
+        unset($result['user_id']);
+        $result['domain'] = $member->domain;
+        $result['client_endpoint'] = $member->client_endpoint;
+//        dd($result);
+        $member->update($result);
+        return true;
+    }
+
+    static function CallB24_field_text_add_new($crm_type, $add)
+    {
+        $res = MyB24::CallB24_refresh_token($add["member_id"]);
+
+        if (!$res) {
+            return false;
+        }
+
+        $data = Setting::where('member_id', $add['member_id'])->first();
+
+        if (!$data) {
+            return false;
+        }
+
+        $method = '';
+
+        switch ($crm_type) {
+            case "CRM_LEAD":
+                $method = "crm.lead.userfield.add";
+                break;
+            case "CRM_COMPANY":
+                $method = "crm.company.userfield.add";
+                break;
+            case "CRM_CONTACT":
+                $method = "crm.contact.userfield.add";
+                break;
+            case "CRM_DEAL":
+                $method = "crm.deal.userfield.add";
+                break;
+            case "CRM_QUOTE":
+                $method = "crm.quote.userfield.add";
+                break;
+        }
+        if (!$method) {
+            return false;
+        }
+
+
+        $url = 'https://' . $data->domain . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $data->access_token,
+            'fields' => [
+                "FIELD_NAME" => $add["FIELD_NAME"],
+                "EDIT_FORM_LABEL" => $add["EDIT_FORM_LABEL"],
+                "LIST_COLUMN_LABEL" => $add["LIST_COLUMN_LABEL"],
+                "USER_TYPE_ID" => $add["USER_TYPE_ID"],
+                "XML_ID" => $add["XML_ID"],
+//                "SETTINGS" => ["DEFAULT_VALUE" => "Привет, мир!"],
+            ]
+        ]);
+
+        return $response->json();
+    }
+
+    static function CallB24_field_enumeration_add(Request $request, $crm_type, $add = [])
+    {
+        $data = $request->input();
+
+        $method = '';
+
+        switch ($crm_type) {
+            case "CRM_LEAD":
+                $method = "crm.lead.userfield.add";
+                break;
+            case "CRM_COMPANY":
+                $method = "crm.company.userfield.add";
+                break;
+            case "CRM_CONTACT":
+                $method = "crm.contact.userfield.add";
+                break;
+            case "CRM_DEAL":
+                $method = "crm.deal.userfield.add";
+                break;
+            case "CRM_QUOTE":
+                $method = "crm.quote.userfield.add";
+                break;
+        }
+        if (!$method) {
+            return false;
+        }
+
+
+        $url = 'https://' . $data['DOMAIN'] . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $data['AUTH_ID'],
+            'fields' => [
+                "FIELD_NAME" => $add["FIELD_NAME"],
+                "EDIT_FORM_LABEL" => $add["EDIT_FORM_LABEL"],
+                "LIST_COLUMN_LABEL" => $add["LIST_COLUMN_LABEL"],
+                "USER_TYPE_ID" => $add["USER_TYPE_ID"],
+                "XML_ID" => $add["XML_ID"],
+                "LIST" => $add["LIST"],
+                "SETTINGS" => ["LIST_HEIGHT" => "3"],
+            ]
+        ]);
+
+        return $response->json();
+    }
+
+    static function CallB24_field_enumeration_add_new($crm_type, $add = [])
+    {
+
+        $data = Setting::where('member_id', $add['member_id'])->first();
+
+        if (!$data) {
+            return false;
+        }
+
+        $res = MyB24::CallB24_refresh_token($add["member_id"]);
+
+        if (!$res) {
+            return false;
+        }
+
+        $multiple = ($add['MULTIPLE']) ? "Y" : "N";
+
+        $method = '';
+
+        switch ($crm_type) {
+            case "CRM_LEAD":
+                $method = "crm.lead.userfield.add";
+                break;
+            case "CRM_COMPANY":
+                $method = "crm.company.userfield.add";
+                break;
+            case "CRM_CONTACT":
+                $method = "crm.contact.userfield.add";
+                break;
+            case "CRM_DEAL":
+                $method = "crm.deal.userfield.add";
+                break;
+            case "CRM_QUOTE":
+                $method = "crm.quote.userfield.add";
+                break;
+        }
+        if (!$method) {
+            return false;
+        }
+
+
+        $url = 'https://' . $data->domain . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $data->access_token,
+            'fields' => [
+                "FIELD_NAME" => $add["FIELD_NAME"],
+                "EDIT_FORM_LABEL" => $add["EDIT_FORM_LABEL"],
+                "LIST_COLUMN_LABEL" => $add["LIST_COLUMN_LABEL"],
+                "USER_TYPE_ID" => $add["USER_TYPE_ID"],
+                "XML_ID" => $add["XML_ID"],
+                "LIST" => json_decode($add['LIST']),
+                "SETTINGS" => ["LIST_HEIGHT" => "3", "DISPLAY" => "DIALOG"],
+                "MULTIPLE" => $multiple
+            ]
+        ]);
+
+        return $response->json();
+    }
+
+    static function CallB24_field_text_upd(Request $request, $crm_type, $XML_ID, $update)
+    {
+        $data = $request->input();
+
+        $method = '';
+
+        switch ($crm_type) {
+            case "CRM_LEAD":
+                $method = "crm.lead.userfield.update";
+                break;
+            case "CRM_COMPANY":
+                $method = "crm.company.userfield.update";
+                break;
+            case "CRM_CONTACT":
+                $method = "crm.contact.userfield.update";
+                break;
+            case "CRM_DEAL":
+                $method = "crm.deal.userfield.update";
+                break;
+            case "CRM_QUOTE":
+                $method = "crm.quote.userfield.update";
+                break;
+        }
+        if (!$method) {
+            return false;
+        }
+
+        $usr_field_list = MyB24::CallB24_field_list($request, $crm_type, $XML_ID);
+
+        if (!isset($usr_field_list['result'][0]['ID'])) {
+            return false;
+        }
+
+        $url = 'https://' . $data['DOMAIN'] . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $data['AUTH_ID'],
+            "id" => $usr_field_list['result'][0]['ID'],
+            "fields" =>
+                [
+                    "EDIT_FORM_LABEL" => $update['EDIT_FORM_LABEL'],
+                    "LIST_COLUMN_LABEL" => $update['LIST_COLUMN_LABEL']
+                ]
+        ]);
+
+        return $response->json();
+    }
+
+    static function CallB24_field_text_upd_new($crm_type, $update)
+    {
+        $data = Setting::where('member_id', $update['member_id'])->first();
+
+        if (!$data) {
+            return false;
+        }
+        $res = MyB24::CallB24_refresh_token($update["member_id"]);
+
+        if (!$res) {
+            return false;
+        }
+        $method = '';
+
+        switch ($crm_type) {
+            case "CRM_LEAD":
+                $method = "crm.lead.userfield.update";
+                break;
+            case "CRM_COMPANY":
+                $method = "crm.company.userfield.update";
+                break;
+            case "CRM_CONTACT":
+                $method = "crm.contact.userfield.update";
+                break;
+            case "CRM_DEAL":
+                $method = "crm.deal.userfield.update";
+                break;
+            case "CRM_QUOTE":
+                $method = "crm.quote.userfield.update";
+                break;
+        }
+        if (!$method) {
+            return false;
+        }
+
+
+        $url = 'https://' . $data->domain . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $data->access_token,
+            "id" => $update['BTX_ID'],
+            "fields" =>
+                [
+                    "EDIT_FORM_LABEL" => $update['EDIT_FORM_LABEL'],
+                    "LIST_COLUMN_LABEL" => $update['LIST_COLUMN_LABEL']
+                ]
+        ]);
+
+        return $response->json();
+    }
+    static function CallB24_field_enumeration_upd_new($crm_type, $update, $ID_del)
+    {
+        $data = Setting::where('member_id', $update['member_id'])->first();
+
+        if (!$data) {
+            return false;
+        }
+
+        $multiple = ($update['MULTIPLE']) ? "Y" : "N";
+
+        $del_field = MyB24::CallB24_field_del_new($crm_type,  $update['member_id'], $ID_del);
+
+        $method = '';
+
+        switch ($crm_type) {
+            case "CRM_LEAD":
+                $method = "crm.lead.userfield.add";
+                break;
+            case "CRM_COMPANY":
+                $method = "crm.company.userfield.add";
+                break;
+            case "CRM_CONTACT":
+                $method = "crm.contact.userfield.add";
+                break;
+            case "CRM_DEAL":
+                $method = "crm.deal.userfield.add";
+                break;
+            case "CRM_QUOTE":
+                $method = "crm.quote.userfield.add";
+                break;
+        }
+        if (!$method) {
+            return false;
+        }
+
+
+        $url = 'https://' . $data->domain . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $data->access_token,
+            'fields' => [
+                "FIELD_NAME" => $update["FIELD_NAME"],
+                "EDIT_FORM_LABEL" => $update["EDIT_FORM_LABEL"],
+                "LIST_COLUMN_LABEL" => $update["LIST_COLUMN_LABEL"],
+                "USER_TYPE_ID" => $update["USER_TYPE_ID"],
+                "XML_ID" => $update["XML_ID"],
+                "LIST" => json_decode($update['LIST']),
+                "SETTINGS" => ["LIST_HEIGHT" => "3", "DISPLAY" => "DIALOG"],
+                "MULTIPLE" => $multiple
+            ]
+        ]);
+
+        return $response->json();
+    }
+
+    static function CallB24_field_enumeration_upd(Request $request, $crm_type, $XML_ID, $update)
+    {
+        $data = $request->input();
+
+        $method = '';
+
+        switch ($crm_type) {
+            case "CRM_LEAD":
+                $method = "crm.lead.userfield.update";
+                break;
+            case "CRM_COMPANY":
+                $method = "crm.company.userfield.update";
+                break;
+            case "CRM_CONTACT":
+                $method = "crm.contact.userfield.update";
+                break;
+            case "CRM_DEAL":
+                $method = "crm.deal.userfield.update";
+                break;
+            case "CRM_QUOTE":
+                $method = "crm.quote.userfield.update";
+                break;
+        }
+        if (!$method) {
+            return false;
+        }
+
+        $usr_field_list = MyB24::CallB24_field_list($request, $crm_type, $XML_ID);
+
+        if (!isset($usr_field_list['result'][0]['ID'])) {
+            return false;
+        }
+
+        $url = 'https://' . $data['DOMAIN'] . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $data['AUTH_ID'],
+            "id" => $usr_field_list['result'][0]['ID'],
+            "fields" =>
+                [
+                    "EDIT_FORM_LABEL" => $update['EDIT_FORM_LABEL'],
+                    "LIST_COLUMN_LABEL" => $update['LIST_COLUMN_LABEL'],
+                    "LIST" => $update["LIST"],
+                ]
+        ]);
+
+        return $response->json();
+    }
+
+    static function CallB24_field_list(Request $request, $crm_type, $XML_ID = null)
+    {
+        $data = $request->input();
+
+        $method = '';
+
+        switch ($crm_type) {
+            case "CRM_LEAD":
+                $method = "crm.lead.userfield.list";
+                break;
+            case "CRM_COMPANY":
+                $method = "crm.company.userfield.list";
+                break;
+            case "CRM_CONTACT":
+                $method = "crm.contact.userfield.list";
+                break;
+            case "CRM_DEAL":
+                $method = "crm.deal.userfield.list";
+                break;
+            case "CRM_QUOTE":
+                $method = "crm.quote.userfield.list";
+                break;
+        }
+        if (!$method) {
+            return false;
+        }
+
+        if ($XML_ID) {
+            $url = 'https://' . $data['DOMAIN'] . '/rest/' . $method . '.json';
+            $response = Http::post($url, [
+                'auth' => $data['AUTH_ID'],
+                'filter' => [
+                    'XML_ID' => $XML_ID
+                ]
+            ]);
+
+        } else {
+            $url = 'https://' . $data['DOMAIN'] . '/rest/' . $method . '.json';
+            $response = Http::post($url, [
+                'auth' => $data['AUTH_ID'],
+            ]);
+        }
+
+
+        return $response->json();
+    }
+
+    static function CallB24_field_del(Request $request, $crm_type, $XML_ID)
+    {
+        $data = $request->input();
+
+        $method = '';
+
+        switch ($crm_type) {
+            case "CRM_LEAD":
+                $method = "crm.lead.userfield.delete";
+                break;
+            case "CRM_COMPANY":
+                $method = "crm.company.userfield.delete";
+                break;
+            case "CRM_CONTACT":
+                $method = "crm.contact.userfield.delete";
+                break;
+            case "CRM_DEAL":
+                $method = "crm.deal.userfield.delete";
+                break;
+            case "CRM_QUOTE":
+                $method = "crm.quote.userfield.delete";
+                break;
+        }
+        if (!$method) {
+            return false;
+        }
+
+        $usr_field_list = MyB24::CallB24_field_list($request, $crm_type, $XML_ID);
+
+        if (!isset($usr_field_list['result'][0]['ID'])) {
+            return false;
+        }
+
+        $url = 'https://' . $data['DOMAIN'] . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $data['AUTH_ID'],
+            "id" => $usr_field_list['result'][0]['ID'],
+        ]);
+
+        return $response->json();
+    }
+
+    static function CallB24_field_del_new($crm_type, $member_id, $ID)
+    {
+        $res = MyB24::CallB24_refresh_token($member_id);
+
+        if (!$res) {
+            return false;
+        }
+
+        $data = Setting::where('member_id', $member_id)->first();
+
+        if (!$data) {
+            return false;
+        }
+
+        $method = '';
+
+        switch ($crm_type) {
+            case "CRM_LEAD":
+                $method = "crm.lead.userfield.delete";
+                break;
+            case "CRM_COMPANY":
+                $method = "crm.company.userfield.delete";
+                break;
+            case "CRM_CONTACT":
+                $method = "crm.contact.userfield.delete";
+                break;
+            case "CRM_DEAL":
+                $method = "crm.deal.userfield.delete";
+                break;
+            case "CRM_QUOTE":
+                $method = "crm.quote.userfield.delete";
+                break;
+        }
+
+        if (!$method) {
+            return false;
+        }
+
+        $url = 'https://' . $data->domain . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $data->access_token,
+            "id" => $ID,
+        ]);
+
+        return $response->json();
     }
 }

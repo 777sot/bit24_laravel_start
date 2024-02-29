@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Api\Deal\Fields;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreRequest extends FormRequest
 {
@@ -11,7 +13,7 @@ class StoreRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +24,35 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'LIST_COLUMN_LABEL' => 'required|string',
+            'USER_TYPE_ID' => 'required|string',
+            'SETTINGS' => 'string',
+            'LIST' => 'string',
+            'MULTIPLE' => 'string|boolean',
+            'member_id' => 'required|string|exists:App\Models\Setting,member_id',
+        ];
+    }
+    public function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'success'   => false,
+            'message'   => 'Validation errors',
+            'data'      => $validator->errors()
+        ]));
+    }
+
+    public function messages(): array
+    {
+        return [
+            'LIST_COLUMN_LABEL.required' => 'A LIST_COLUMN_LABEL is required',
+            'LIST_COLUMN_LABEL.string' => 'A LIST_COLUMN_LABEL is string',
+            'USER_TYPE_ID.required' => 'A USER_TYPE_ID is required',
+            'USER_TYPE_ID.string' => 'A USER_TYPE_ID is string',
+            'SETTINGS.string' => 'A SETTINGS is string',
+            'LIST.string' => 'A LIST is string',
+            'member_id.string' => 'A member_id must be string',
+            'MULTIPLE.string' => 'A MULTIPLE must be 0 or 1',
+            'MULTIPLE.boolean' => 'A MULTIPLE must be 0 or 1',
         ];
     }
 }

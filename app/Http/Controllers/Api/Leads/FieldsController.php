@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Api\Leads;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Leads\Fields\ShowRequest;
 use App\Http\Requests\Api\Leads\Fields\StoreRequest;
 use App\Http\Requests\Api\Leads\Fields\UpdateRequest;
-use App\Http\Resources\Api\Fields\FieldResource;
+use App\Http\Resources\Api\Leads\FieldResource;
+use App\Http\Services\MyB24;
 use App\Models\Field;
 use App\Models\ListField;
 use App\Models\Rule;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 
 class FieldsController extends Controller
@@ -16,9 +19,13 @@ class FieldsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(ShowRequest $request)
     {
-        $fields = Field::all();
+
+        $data = $request->validated();
+
+        $fields = Field::where('CRM_TYPE', 'CRM_LEAD')->where('member_id', $data['member_id'])->get();
+
         return FieldResource::collection($fields);
     }
 
@@ -28,10 +35,13 @@ class FieldsController extends Controller
     public function store(StoreRequest $request)
     {
         $data = $request->validated();
+
         $field_name = mb_strtoupper($data['USER_TYPE_ID']);
+
         $field = Field::where('FIELD_NAME', 'LIKE', "%{$field_name}%")
             ->orderBy('id', 'desc')
             ->first();
+
         if (!$field) {
             $data['FIELD_NAME'] = $field_name . "_1";
         } else {
@@ -42,22 +52,24 @@ class FieldsController extends Controller
             $num = explode('_', $field->FIELD_NAME);
             $data['FIELD_NAME'] = $field_name . "_" . ++$num[1];
         }
+
         $data['CRM_TYPE'] = "CRM_LEAD";
+
         $data['EDIT_FORM_LABEL'] = $data['LIST_COLUMN_LABEL'];
         $data['XML_ID'] = $data['FIELD_NAME'];
 
         $field = Field::firstOrCreate([
             'LIST_COLUMN_LABEL' => $data['LIST_COLUMN_LABEL'],
             'CRM_TYPE' => $data['CRM_TYPE'],
+            'member_id' => $data['member_id']
         ], $data);
 
         if ($data['USER_TYPE_ID'] == "enumeration" && !empty($data['LIST'])) {
 
             $lists = json_decode($data['LIST']);
-//            $lists = $data['LIST'];
 
             foreach ($lists as $list) {
-                if(!isset($list->VALUE)){
+                if (!isset($list->VALUE)) {
                     return array('data' =>
                         ['status' => false],
                         ['message' => "LIST VALUES IS EMPTY"],
@@ -76,6 +88,29 @@ class FieldsController extends Controller
 
 
         if ($field) {
+
+            //ДОБАВЛЕНИЕ ПОЛЯ В БИТРИКС
+            //  list
+            if ($field->USER_TYPE_ID == 'enumeration') {
+                $add_field_list = MyB24::CallB24_field_enumeration_add_new("CRM_LEAD", $data);
+                if(isset($add_field_list['result'])){
+                    $btx_id = $add_field_list['result'];
+                    $field->BTX_ID = $btx_id;
+                }else{
+                    return $add_field_list;
+                }
+
+                $field->save();
+            }
+            // string
+            if ($data['USER_TYPE_ID'] == 'string') {
+                $add_field_text = MyB24::CallB24_field_text_add_new("CRM_LEAD", $data);
+                $btx_id = $add_field_text['result'];
+                $field->BTX_ID = $btx_id;
+                $field->save();
+            }
+            ///---
+
             return new FieldResource($field);
         } else {
             return array('data' => ['status' => false]);
@@ -85,11 +120,25 @@ class FieldsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(ShowRequest $request, string $id)
     {
+
+        $data = $request->validated();
+
         $field = Field::find($id);
 
         if ($field) {
+
+            $setting = Setting::where('member_id', $data['member_id'])->first();
+
+            if ($field->member_id != $setting->member_id) {
+                return array('data' => [
+                    'status' => false,
+                    'messages' => "member_id values are not valid",
+                ]);
+            }
+
+
             return new FieldResource($field);
         } else {
             return array('data' => [
@@ -109,17 +158,53 @@ class FieldsController extends Controller
         $field = Field::find($id);
 
         if ($field) {
+
+            if (!empty($data['member_id'])) {
+
+                $setting = Setting::where('member_id', $data['member_id'])->first();
+
+                if ($field->member_id != $setting->member_id) {
+
+                    return array('data' => [
+                        'status' => false,
+                        'messages' => "member_id values are not valid",
+                    ]);
+                }
+            }
+
+
             $data['EDIT_FORM_LABEL'] = $data['LIST_COLUMN_LABEL'];
             $field->update($data);
             $field->refresh();
 
+            //ОБНОВЛЕНИЕ ПОЛЯ В БИТРИКС
+            //  list
+            if ($field->USER_TYPE_ID == 'enumeration' || !empty($field->BTX_ID)) {
+                $data['FIELD_NAME'] = $field->FIELD_NAME;
+                $data['XML_ID'] = $field->XML_ID;
+                $data['USER_TYPE_ID'] = $field->USER_TYPE_ID;
+                $data['CRM_TYPE'] = $field->CRM_TYPE;
+                $data['MULTIPLE'] = ($data['MULTIPLE']) ? $data['MULTIPLE'] : $field->MULTIPLE;
+                $add_field_list = MyB24::CallB24_field_enumeration_upd_new("CRM_LEAD", $data, $field->BTX_ID);
+                if(isset($add_field_list['result'])){
+                    $btx_id = $add_field_list['result'];
+                    $field->BTX_ID = $btx_id;
+                }
+                $field->save();
+            }
+            //  list
+            if ($field->USER_TYPE_ID == 'string') {
+                $data['BTX_ID'] = $field->BTX_ID;
+                $upd_field_text = MyB24::CallB24_field_text_upd_new("CRM_LEAD", $data);
+            }
+            ///---
+
             if (!empty($data['LIST'])) {
 
                 $field->lists()->delete();
-               // return 222;
                 $lists = json_decode($data['LIST']);
                 foreach ($lists as $list) {
-                    if(!isset($list->VALUE)){
+                    if (!isset($list->VALUE)) {
                         return array('data' =>
                             ['status' => false],
                             ['message' => "LIST VALUES IS EMPTY"],
@@ -149,25 +234,37 @@ class FieldsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(ShowRequest $request, string $id)
     {
+        $data = $request->validated();
+
         $field = Field::find($id);
 
         if ($field) {
 
+            $setting = Setting::where('member_id', $data['member_id'])->first();
+
+            if ($field->member_id != $setting->member_id) {
+
+                return array('data' => [
+                    'status' => false,
+                    'messages' => "member_id values are not valid",
+                ]);
+            }
+
             $rules = Rule::all();
 
-            foreach ($rules as $rule){
-                if($rule->field_id == $id){
+            foreach ($rules as $rule) {
+                if ($rule->field_id == $id) {
                     $rule->delete();
                     continue;
                 }
-                $rule_arr =  json_decode($rule->rule);
+                $rule_arr = json_decode($rule->rule);
                 $new_rule = array();
-                foreach ($rule_arr as $value){
-                    if ($value->id == $id){
+                foreach ($rule_arr as $value) {
+                    if ($value->id == $id) {
                         continue;
-                    }else{
+                    } else {
                         $new_rule[] = $value;
                     }
                 }
@@ -175,6 +272,13 @@ class FieldsController extends Controller
                     'rule' => json_encode($new_rule)
                 ]);
             }
+
+            if(!empty($field->BTX_ID)){
+                //УДАЛЕНИЕ ПОЛЯ В БИТРИКС
+                $del_field = MyB24::CallB24_field_del_new("CRM_LEAD", $field->member_id, $field->BTX_ID);
+                ///---
+            }
+
 
             $field->lists()->delete();
             $field->delete();
@@ -188,9 +292,10 @@ class FieldsController extends Controller
             return array('data' => [
                 'status' => false,
                 'messages' => 'Field is not found',
-                ]);
+            ]);
         }
     }
+
     /**
      * Remove the specified resource from storage.
      */
@@ -198,7 +303,7 @@ class FieldsController extends Controller
     {
         $data = $request->input();
 
-        if(empty($data['index'])){
+        if (empty($data['index'])) {
 
             return array('data' => [
                 'status' => false,
@@ -210,18 +315,18 @@ class FieldsController extends Controller
 
         $count_fields = Field::where('CRM_TYPE', "CRM_LEAD")->count();
 
-        if($count_fields != count($indexs)){
+        if ($count_fields != count($indexs)) {
             return array('data' => [
                 'status' => false,
                 'messages' => "The number of fields is not equal to the number of indexes",
             ]);
         }
 
-        foreach ($indexs as $index){
+        foreach ($indexs as $index) {
 
             $field = Field::find($index->field_id);
 
-            if(!$field){
+            if (!$field) {
                 return array('data' => [
                     'status' => false,
                     'messages' => "Field ID = $index->field_id is not found",
@@ -233,7 +338,7 @@ class FieldsController extends Controller
             ]);
         }
 
-        $fields = Field::where('CRM_TYPE', "CRM_LEAD")->get();
+        $fields = Field::where('CRM_TYPE', "CRM_DEAL")->get();
 
         return FieldResource::collection($fields);
     }

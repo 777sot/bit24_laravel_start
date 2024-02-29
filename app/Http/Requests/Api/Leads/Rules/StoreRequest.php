@@ -28,6 +28,7 @@ class StoreRequest extends FormRequest
             'rule' => 'required|string',
             'rule_type' => 'required|string',
             'show' => 'string|boolean',
+            'member_id' => 'required|string|exists:App\Models\Setting,member_id',
         ];
     }
 

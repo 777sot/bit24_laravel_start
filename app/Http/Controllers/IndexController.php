@@ -17,6 +17,45 @@ class IndexController extends Controller
     public function index(Request $request)
     {
 
+        //ДОБАВЛЕНИЕ ПОЛЯ ТЕКСТ
+        $add = [];
+        $add["FIELD_NAME"] = "MY_STROKA_TEST";
+        $add["EDIT_FORM_LABEL"] = "TEST STROKA";
+        $add["LIST_COLUMN_LABEL"] = $add["EDIT_FORM_LABEL"];
+        $add["USER_TYPE_ID"] = 'string';
+        $add["XML_ID"] = 'MY_LIST_TEST';
+        $add["member_id"] = '6c65247a243ea9e94902130e110452c9';
+//        $add["LIST"] = [["VALUE" => "Элемент #1"], ["VALUE" => "Элемент #2"], ["VALUE" => "Элемент #3"], ["VALUE" => "Элемент #4"], ["VALUE" => "Элемент #5"]] ;
+//        $add_field_text = MyB24::CallB24_field_text_add($request, "CRM_LEAD", $add);
+//        $add_field_text = MyB24::CallB24_field_enumeration_add($request, "CRM_LEAD", $add);
+//        $add_field_text = MyB24::CallB24_field_text_add_new("CRM_LEAD", $add);
+//        $ref = MyB24::CallB24_refresh_token($add["member_id"]);
+//        dd($ref);
+//        dd($add_field_text);
+        //ОБНОВЛЕНИЕ ПОЛЯ ТЕКСТ
+        $update = [];
+        $update['LIST_COLUMN_LABEL'] = 'СПИСОК NEW CRM_LEAD UPD';
+        $update["EDIT_FORM_LABEL"] = $update["LIST_COLUMN_LABEL"];
+        $update["LIST"] = [["VALUE" => "Элемент #188"], ["VALUE" => "Элемент #288"],  ["VALUE" => "Элемент #4"], ["VALUE" => "Элемент #5"]] ;
+
+
+//        $upd_field_text = MyB24::CallB24_field_enumeration_upd($request,  "CRM_LEAD", 'MY_LIST_TEST', $update);
+//        dd($upd_field_text);
+        //УДАЛЕНИЕ ПОЛЯ В БИТРИКС
+//        $del_field = MyB24::CallB24_field_del($request, "CRM_LEAD", 'MY_LIST_TEST');
+//        dd($del_field);
+        //СПИСОК ПОЛЬЗОВАТЕЛЬСКИХ ПОЛЕЙ СПИСОК
+        $usr_field_list = MyB24::CallB24_field_list($request,  "CRM_LEAD", );
+        dd($usr_field_list);
+        //ДОБАВЛЕНИЕ ПОЛЯ СПИСОК
+
+        //ДОБАВЛЕНИЕ ПОЛЯ СПИСОК (МНОЖЕСТВЕННЫЙ)
+
+
+//        $result_del = MyB24::placementCallB24_delete($request, 'userfieldtype.delete');
+//        $result_list = MyB24::placementCallB24_list($request, 'userfieldtype.list');
+//        return $result_list->body();
+
 //        dd($request->input());
 //        $fields_CRM_LEAD = Services::refreshCRM_LEADfields($request);
 //        $fields_CRM_DEAL = Services::refreshCRM_DEALfields($request);
@@ -27,8 +66,8 @@ class IndexController extends Controller
 //        $result = MyB24::getCallB24configReset($request, 'crm.lead.details.configuration.reset');
 //        $result = MyB24::getCallB24config($request, 'crm.lead.details.configuration.set');
 
-        $result1 = FieldsBTX::AddTextField($request);
-        $result2 = FieldsBTX::AddListField($request);
+//        $result1 = FieldsBTX::AddTextField($request);
+//        $result2 = FieldsBTX::AddListField($request);
 
 //        dump($result1);
 //        dd($result2);
@@ -117,10 +156,15 @@ class IndexController extends Controller
         $install_result = MyB24::installApp($request);
 
         $result = MyB24::placementCallB24($request, 'userfieldtype.add');
-
+//
+//        dd($result);
+//        $result = MyB24::placementCallB24_list($request, 'userfieldtype.list');
+//
+//        dd($result);
         $result_bind = MyB24::bindCallB24($request, 'event.bind', 'ONCRMLEADADD');
         $result_bind_2 = MyB24::bindCallB24($request, 'event.bind', 'ONCRMLEADUPDATE');
 
+        Log::info($result);
         Log::info($result_bind);
         Log::info($result_bind_2);
 
@@ -148,9 +192,10 @@ class IndexController extends Controller
 
         $event = $request->input('event');
 
-        if(in_array($event, ['0' => 'ONCRMLEADADD', '1' => 'ONCRMLEADUPDATE'])){}
+        if (in_array($event, ['0' => 'ONCRMLEADADD', '1' => 'ONCRMLEADUPDATE'])) {
+        }
 
-            $result = MyB24::setLeadsCallB24_test($request, 'crm.lead.update');
+        $result = MyB24::setLeadsCallB24_test($request, 'crm.lead.update');
         Log::info($result);
 
 
@@ -165,12 +210,19 @@ class IndexController extends Controller
 
         $result = MyB24::setLeadsCallB24($request, 'crm.lead.update', $request);
         $fields = Field::all();
-        return view('btx.placement', compact('id','fields', 'domain', 'auth_id'));
+        return view('btx.placement', compact('id', 'fields', 'domain', 'auth_id'));
     }
 
     public function placement(Request $request)
     {
-        $result = MyB24::placementCallB24upd($request, 'userfieldtype.update');
+        dd($request->input()) ;
+        $result = MyB24::placementCallB24_list($request, 'userfieldtype.list');
+
+        dd($result->body());
+//        $result_del = MyB24::placementCallB24_delete($request, 'userfieldtype.delete');
+//
+//        $result = MyB24::placementCallB24upd($request, 'userfieldtype.update');
+//        dd($result_del);
 //        $result = MyB24::getCallB24configReset($request, 'crm.contact.details.configuration.reset');
 //        $result = MyB24::getCallB24config($request, 'crm.lead.details.configuration.set');
 
@@ -182,6 +234,6 @@ class IndexController extends Controller
 
         $fields = Field::all();
 //        dd($fields);
-        return view('btx.placement', compact('id','fields', 'domain', 'auth_id'));
+        return view('btx.placement', compact('id', 'fields', 'domain', 'auth_id'));
     }
 }

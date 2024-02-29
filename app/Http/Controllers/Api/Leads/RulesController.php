@@ -3,13 +3,15 @@
 namespace App\Http\Controllers\Api\Leads;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Leads\Rules\ShowRequest;
 use App\Http\Requests\Api\Leads\Rules\StoreRequest;
 use App\Http\Requests\Api\Leads\Rules\UpdateRequest;
-use App\Http\Resources\Api\Fields\FieldResource;
-use App\Http\Resources\Api\Fields\RuleResource;
+
+use App\Http\Resources\Api\Leads\RuleResource;
 use App\Http\Services\Services;
 use App\Models\Field;
 use App\Models\Rule;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 
 class RulesController extends Controller
@@ -17,9 +19,13 @@ class RulesController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(ShowRequest $request)
     {
-        return RuleResource::collection(Rule::all());
+        $data = $request->validated();
+
+        $rules = Rule::where('CRM_TYPE', 'CRM_LEAD')->where('member_id', $data['member_id'])->get();
+
+        return RuleResource::collection($rules);
     }
 
     /**
@@ -42,6 +48,7 @@ class RulesController extends Controller
         $fields = $data['fields'];
         $rules = $data['rule'];
         $rule_type = $data['rule_type'];
+        $member_id = $data['member_id'];
 
         $rules = json_decode($rules);
 
@@ -56,6 +63,8 @@ class RulesController extends Controller
 
         $results = array();
 
+        $setting = Setting::where('member_id', $data['member_id'])->first();
+
         foreach ($fields as $field) {
 
             $field_val = Field::find($field->field_id);
@@ -64,6 +73,14 @@ class RulesController extends Controller
                 return array('data' => [
                     'status' => false,
                     'messages' => "field_id = $field->field_id is not found",
+                ]);
+            }
+
+            if ($field_val->member_id != $setting->member_id) {
+
+                return array('data' => [
+                    'status' => false,
+                    'messages' => "member_id values are not valid",
                 ]);
             }
 
@@ -76,6 +93,14 @@ class RulesController extends Controller
                     return array('data' => [
                         'status' => false,
                         'messages' => "field_id = $rule->id is not found",
+                    ]);
+                }
+
+                if ($field_val->member_id != $setting->member_id) {
+
+                    return array('data' => [
+                        'status' => false,
+                        'messages' => "member_id values are not valid",
                     ]);
                 }
 
@@ -99,12 +124,14 @@ class RulesController extends Controller
                 'field_id' => $field->field_id,
                 'rule' => json_encode($rules),
                 'rule_type' => $rule_type,
+                'member_id' => $member_id,
             ], [
                 'field_id' => $field->field_id,
                 'CRM_TYPE' => "CRM_LEAD",
                 'rule' => json_encode($rules),
                 'rule_type' => $rule_type,
                 'show' => $data['show'] ?? 0,
+                'member_id' => $member_id,
             ]);
         }
         return RuleResource::collection($results);
@@ -156,17 +183,29 @@ class RulesController extends Controller
 //            'rule_type' => 3,
 //            'show' => 1,
 //        ]);
-        return $data;
+//        return $data;
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(ShowRequest $request, string $id)
     {
+        $data = $request->validated();
+
         $rule = Rule::find($id);
 
         if ($rule) {
+
+            $setting = Setting::where('member_id', $data['member_id'])->first();
+
+            if ($rule->member_id != $setting->member_id) {
+
+                return array('data' => [
+                    'status' => false,
+                    'messages' => "member_id values are not valid",
+                ]);
+            }
             return new RuleResource($rule);
         } else {
             return array('data' => [
@@ -186,6 +225,16 @@ class RulesController extends Controller
         $rule_data = Rule::find($id);
 
         if ($rule_data) {
+
+            $setting = Setting::where('member_id', $data['member_id'])->first();
+
+            if ($rule_data->member_id != $setting->member_id) {
+
+                return array('data' => [
+                    'status' => false,
+                    'messages' => "member_id values are not valid",
+                ]);
+            }
 
             $rules_fields = array(
                 0 => 'РАВНО',
@@ -214,6 +263,14 @@ class RulesController extends Controller
                     ]);
                 }
 
+                if ($field_val->member_id != $setting->member_id) {
+
+                    return array('data' => [
+                        'status' => false,
+                        'messages' => "member_id values are not valid",
+                    ]);
+                }
+
                 foreach ($rules as $rule) {
 
                     $field_val = Field::find($rule->id);
@@ -222,6 +279,14 @@ class RulesController extends Controller
                         return array('data' => [
                             'status' => false,
                             'messages' => "field_id = $rule->id is not found",
+                        ]);
+                    }
+
+                    if ($field_val->member_id != $setting->member_id) {
+
+                        return array('data' => [
+                            'status' => false,
+                            'messages' => "member_id values are not valid",
                         ]);
                     }
 
@@ -243,11 +308,12 @@ class RulesController extends Controller
 
                 $rule_data->update([
                     'field_id' => $field->field_id,
-                    'CRM_TYPE' => "CRM_LEAD",
                     'rule' => json_encode($rules),
                     'rule_type' => $rule_type,
                     'show' => $data['show'] ?? 0,
+                    'member_id' => $data['member_id'],
                 ]);
+
                 $rule_data->refresh();
             }
 
@@ -264,13 +330,26 @@ class RulesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(ShowRequest $request, string $id)
     {
+        $data = $request->validated();
+
         $rule = Rule::find($id);
 
         if ($rule) {
 
+            $setting = Setting::where('member_id', $data['member_id'])->first();
+
+            if ($rule->member_id != $setting->member_id) {
+
+                return array('data' => [
+                    'status' => false,
+                    'messages' => "member_id values are not valid",
+                ]);
+            }
+
             $rule->delete();
+
             return array('data' => [
                 'status' => true,
                 'messages' => 'Rule is deleted',
