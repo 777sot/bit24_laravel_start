@@ -66,7 +66,6 @@ class RulesController extends Controller
         $setting = Setting::where('member_id', $data['member_id'])->first();
 
         foreach ($fields as $field) {
-
             $field_val = Field::find($field->field_id);
 
             if (!$field_val) {

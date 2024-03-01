@@ -57,6 +57,7 @@ class FieldsController extends Controller
 
         $data['EDIT_FORM_LABEL'] = $data['LIST_COLUMN_LABEL'];
         $data['XML_ID'] = $data['FIELD_NAME'];
+        $data['MULTIPLE'] = $data['MULTIPLE'] ?? 0;
 
         $field = Field::firstOrCreate([
             'LIST_COLUMN_LABEL' => $data['LIST_COLUMN_LABEL'],
@@ -96,8 +97,30 @@ class FieldsController extends Controller
                 if(isset($add_field_list['result'])){
                     $btx_id = $add_field_list['result'];
                     $field->BTX_ID = $btx_id;
+                    $field->save();
+                    //ДОБАВЛЕНИЕ LIST BTX_ID
+                    $usr_field_list = MyB24::CallB24_field_list_new("CRM_LEAD", $field->member_id, $field->BTX_ID);
+                    foreach ($usr_field_list['result']['LIST'] as $btx_list){
+                        $list_fnd = ListField::where('field_id', $field->id)->where('value', $btx_list['VALUE'])->first();
+                        $list_fnd->BTX_ID = $btx_list['ID'];
+                        $list_fnd->save();
+                    }
+//                    return $usr_field_list['result'];
+                    //
+
                 }else{
-                    return $add_field_list;
+                    $usr_field_list = MyB24::CallB24_field_list_new("CRM_LEAD", $field->member_id, $field->BTX_ID);
+                    //                    $list_btx_id =  $usr_field_list['result']['LIST'][0]['ID'];
+//                    $list_btx_value =  $usr_field_list['result']['LIST'][0]['VALUE'];
+                    foreach ($usr_field_list['result']['LIST'] as $btx_list){
+                        $list_fnd = ListField::where('field_id', $field->id)->where('value', $btx_list['VALUE'])->first();
+                        $list_fnd->BTX_ID = $btx_list['ID'];
+                        $list_fnd->save();
+                    }
+//                    $list_fnd = ListField::where('field_id', $field->id)->where('value', $list_btx_value)->first();
+//                    return  $list_fnd;
+
+//                    return $add_field_list;
                 }
 
                 $field->save();
@@ -179,12 +202,12 @@ class FieldsController extends Controller
 
             //ОБНОВЛЕНИЕ ПОЛЯ В БИТРИКС
             //  list
-            if ($field->USER_TYPE_ID == 'enumeration' || !empty($field->BTX_ID)) {
+            if ($field->USER_TYPE_ID == 'enumeration' && !empty($field->BTX_ID)) {
                 $data['FIELD_NAME'] = $field->FIELD_NAME;
                 $data['XML_ID'] = $field->XML_ID;
                 $data['USER_TYPE_ID'] = $field->USER_TYPE_ID;
                 $data['CRM_TYPE'] = $field->CRM_TYPE;
-                $data['MULTIPLE'] = ($data['MULTIPLE']) ? $data['MULTIPLE'] : $field->MULTIPLE;
+                $data['MULTIPLE'] = (!empty($data['MULTIPLE'])) ? $data['MULTIPLE'] : $field->MULTIPLE;
                 $add_field_list = MyB24::CallB24_field_enumeration_upd_new("CRM_LEAD", $data, $field->BTX_ID);
                 if(isset($add_field_list['result'])){
                     $btx_id = $add_field_list['result'];
@@ -193,7 +216,7 @@ class FieldsController extends Controller
                 $field->save();
             }
             //  list
-            if ($field->USER_TYPE_ID == 'string') {
+            if ($field->USER_TYPE_ID == 'string' && !empty($field->BTX_ID)) {
                 $data['BTX_ID'] = $field->BTX_ID;
                 $upd_field_text = MyB24::CallB24_field_text_upd_new("CRM_LEAD", $data);
             }

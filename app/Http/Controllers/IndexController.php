@@ -42,11 +42,11 @@ class IndexController extends Controller
 //        $upd_field_text = MyB24::CallB24_field_enumeration_upd($request,  "CRM_LEAD", 'MY_LIST_TEST', $update);
 //        dd($upd_field_text);
         //УДАЛЕНИЕ ПОЛЯ В БИТРИКС
-//        $del_field = MyB24::CallB24_field_del($request, "CRM_LEAD", 'MY_LIST_TEST');
+//        $del_field = MyB24::CallB24_field_del($request, "CRM_LEAD", 'ENUMERATION_2');
 //        dd($del_field);
         //СПИСОК ПОЛЬЗОВАТЕЛЬСКИХ ПОЛЕЙ СПИСОК
-        $usr_field_list = MyB24::CallB24_field_list($request,  "CRM_LEAD", );
-        dd($usr_field_list);
+//        $usr_field_list = MyB24::CallB24_field_list($request,  "CRM_LEAD", );
+//        dd($usr_field_list);
         //ДОБАВЛЕНИЕ ПОЛЯ СПИСОК
 
         //ДОБАВЛЕНИЕ ПОЛЯ СПИСОК (МНОЖЕСТВЕННЫЙ)
@@ -71,6 +71,13 @@ class IndexController extends Controller
 
 //        dump($result1);
 //        dd($result2);
+
+        $crm_type = "CRM_LEAD";
+        $res['member_id'] = "e06846e3d3560fffef5142c3fff0a8f6";
+        $res['ENTITY_VALUE_ID'] = "2";
+        $get = MyB24::CallB24_get_crm($crm_type, $res);
+
+        dd($get);
 
 
         Log::info("INDEX");
@@ -215,10 +222,11 @@ class IndexController extends Controller
 
     public function placement(Request $request)
     {
-        dd($request->input()) ;
-        $result = MyB24::placementCallB24_list($request, 'userfieldtype.list');
-
-        dd($result->body());
+        $data = $request->input();
+//        dd(json_decode($data['PLACEMENT_OPTIONS'])->ENTITY_ID) ;
+//        $result = MyB24::placementCallB24_list($request, 'userfieldtype.list');
+//
+//        dd($result->body());
 //        $result_del = MyB24::placementCallB24_delete($request, 'userfieldtype.delete');
 //
 //        $result = MyB24::placementCallB24upd($request, 'userfieldtype.update');
@@ -227,12 +235,13 @@ class IndexController extends Controller
 //        $result = MyB24::getCallB24config($request, 'crm.lead.details.configuration.set');
 
 //        dd($request->input());
-
+//
         $domain = $request->input('DOMAIN');
         $auth_id = $request->input('AUTH_ID');
         $id = Services::getLeads($request, 'id');
+        $CRM_TYPE = json_decode($data['PLACEMENT_OPTIONS'])->ENTITY_ID;
 
-        $fields = Field::all();
+        $fields = Field::where('member_id','e06846e3d3560fffef5142c3fff0a8f6')->where('CRM_TYPE',$CRM_TYPE)->get();
 //        dd($fields);
         return view('btx.placement', compact('id', 'fields', 'domain', 'auth_id'));
     }

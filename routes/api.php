@@ -49,6 +49,19 @@ Route::delete('/leads/fields/{field}', [\App\Http\Controllers\Api\Leads\FieldsCo
 Route::post('/leads/update_index', [\App\Http\Controllers\Api\Leads\FieldsController::class, 'update_index'])->name('leads.fields.update_index');
 //-----------
 //----------------
+//TODO ЗНАЧЕНИЯ ДЛЯ ЛИДА
+//ВЫВОД ЗНАЧЕНИЙ ДЛЯ ЛИДА
+Route::get('/leads/values', [\App\Http\Controllers\Api\Leads\ValuesController::class, 'index'])->name('leads.values.index');
+//ДОБАВЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ ЛИДА
+Route::post('/leads/values', [\App\Http\Controllers\Api\Leads\ValuesController::class, 'store'])->name('leads.values.store');
+//ОБНОВЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ ЛИДА
+Route::patch('/leads/values/{id}', [\App\Http\Controllers\Api\Leads\ValuesController::class, 'update'])->name('leads.values.update');
+//ПОЛУЧЕНИЯ ЗНАЧЕНИЙ ДЛЯ ЛИДА
+Route::get('/leads/values/{id}', [\App\Http\Controllers\Api\Leads\ValuesController::class, 'show'])->name('leads.values.show');
+//УДАЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ ЛИДА
+Route::delete('/leads/values/{field}', [\App\Http\Controllers\Api\Leads\ValuesController::class, 'destroy'])->name('leads.values.destroy');
+//-----------
+//----------------
 
 //TODO ПРАВИЛА ДЛЯ КОНТАКТА
 //ВЫВОД ПРАВИЛ ДЛЯ КОНТАКТА

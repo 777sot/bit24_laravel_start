@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->string('CRM_TYPE');
             $table->string('value');
             $table->string('member_id')->nullable();
+            $table->string('BTX_ID')->nullable();
             $table->timestamps();
         });
     }

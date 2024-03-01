@@ -745,6 +745,7 @@ class MyB24
 
         return $response->json();
     }
+
     static function CallB24_field_enumeration_upd_new($crm_type, $update, $ID_del)
     {
         $data = Setting::where('member_id', $update['member_id'])->first();
@@ -755,7 +756,7 @@ class MyB24
 
         $multiple = ($update['MULTIPLE']) ? "Y" : "N";
 
-        $del_field = MyB24::CallB24_field_del_new($crm_type,  $update['member_id'], $ID_del);
+        $del_field = MyB24::CallB24_field_del_new($crm_type, $update['member_id'], $ID_del);
 
         $method = '';
 
@@ -791,7 +792,7 @@ class MyB24
                 "USER_TYPE_ID" => $update["USER_TYPE_ID"],
                 "XML_ID" => $update["XML_ID"],
                 "LIST" => json_decode($update['LIST']),
-                "SETTINGS" => ["LIST_HEIGHT" => "3", "DISPLAY" => "DIALOG"],
+                "SETTINGS" => ["LIST_HEIGHT" => "3", "DISPLAY" => "DIALOG", "SHOW_NO_VALUE" => "Y"],
                 "MULTIPLE" => $multiple
             ]
         ]);
@@ -894,6 +895,55 @@ class MyB24
         return $response->json();
     }
 
+    static function CallB24_field_list_new($crm_type, $member_id, $ID)
+    {
+        $res = MyB24::CallB24_refresh_token($member_id);
+
+        if (!$res) {
+            return false;
+        }
+
+        $data = Setting::where('member_id', $member_id)->first();
+
+        if (!$data) {
+            return false;
+        }
+
+
+        $method = '';
+
+        switch ($crm_type) {
+            case "CRM_LEAD":
+                $method = "crm.lead.userfield.get";
+                break;
+            case "CRM_COMPANY":
+                $method = "crm.company.userfield.get";
+                break;
+            case "CRM_CONTACT":
+                $method = "crm.contact.userfield.get";
+                break;
+            case "CRM_DEAL":
+                $method = "crm.deal.userfield.get";
+                break;
+            case "CRM_QUOTE":
+                $method = "crm.quote.userfield.get";
+                break;
+        }
+        if (!$method) {
+            return false;
+        }
+
+
+        $url = 'https://' . $data->domain . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $data->access_token,
+            'ID' => $ID
+        ]);
+
+
+        return $response->json();
+    }
+
     static function CallB24_field_del(Request $request, $crm_type, $XML_ID)
     {
         $data = $request->input();
@@ -982,4 +1032,97 @@ class MyB24
 
         return $response->json();
     }
+
+    static function CallB24_upd_values($crm_type, $update)
+    {
+        $data = Setting::where('member_id', $update['member_id'])->first();
+
+        if (!$data) {
+            return false;
+        }
+        $res = MyB24::CallB24_refresh_token($update["member_id"]);
+
+        if (!$res) {
+            return false;
+        }
+        $method = '';
+
+        switch ($crm_type) {
+            case "CRM_LEAD":
+                $method = "crm.lead.update";
+                break;
+            case "CRM_COMPANY":
+                $method = "crm.company.update";
+                break;
+            case "CRM_CONTACT":
+                $method = "crm.contact.update";
+                break;
+            case "CRM_DEAL":
+                $method = "crm.deal.update";
+                break;
+            case "CRM_QUOTE":
+                $method = "crm.quote.update";
+                break;
+        }
+        if (!$method) {
+            return false;
+        }
+
+
+        $url = 'https://' . $data->domain . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $data->access_token,
+            "id" => $update['ENTITY_VALUE_ID'],
+            "fields" => $update['values_data']
+        ]);
+
+        return $response->json();
+    }
+
+    static function CallB24_get_crm($crm_type, $res)
+    {
+        $data = Setting::where('member_id', $res['member_id'])->first();
+
+        if (!$data) {
+            return false;
+        }
+        $res = MyB24::CallB24_refresh_token($res["member_id"]);
+
+        if (!$res) {
+            return false;
+        }
+        $method = '';
+
+        switch ($crm_type) {
+            case "CRM_LEAD":
+                $method = "crm.lead.get";
+                break;
+            case "CRM_COMPANY":
+                $method = "crm.company.get";
+                break;
+            case "CRM_CONTACT":
+                $method = "crm.contact.get";
+                break;
+            case "CRM_DEAL":
+                $method = "crm.deal.get";
+                break;
+            case "CRM_QUOTE":
+                $method = "crm.quote.get";
+                break;
+        }
+        if (!$method) {
+            return false;
+        }
+
+
+        $url = 'https://' . $data->domain . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $data->access_token,
+            "id" => '2',
+        ]);
+
+        return $response->json();
+    }
+
+
 }

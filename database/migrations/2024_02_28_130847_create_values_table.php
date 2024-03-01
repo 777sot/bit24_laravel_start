@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('values', function (Blueprint $table) {
             $table->id();
-            $table->string('member_id')->unique();
+            $table->string('member_id');
             $table->foreignId('field_id')->nullable()->index()->constrained('fields');
-            $table->string('id_btx')->nullable();
+            $table->string('BTX_ID')->nullable();
             $table->string('VALUE')->nullable();
             $table->string('CRM_TYPE')->nullable();
             $table->string('ENTITY_VALUE_ID')->nullable();

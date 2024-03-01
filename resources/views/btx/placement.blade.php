@@ -3,29 +3,49 @@
 @section('content')
     <div class="space-y-12">
         <div class="border-b border-gray-900/10 pb-12">
-<h3 id="el1"></h3>
-<h3 id="elem">****</h3>
-            <button type="button" id="check_btn" class="btn btn-danger" >Отправить</button>
+            <h3 id="el1"></h3>
+            <h3 id="elem">****</h3>
+            <button type="button" id="check_btn" class="btn btn-danger">Отправить</button>
         </div>
     </div>
+    <button type="button" id="values_btn" class="btn btn-danger">СОХРАНИТЬ</button>
     <div
         class="grid h-full w-full justify-items-center overflow-hidden place-items-start justify-items-center p-6 py-8 sm:p-8 lg:p-12">
         <form method="POST" class="w-full max-w-sm space-y-8" action="{{ route('leads') }}">
-@foreach($fields as $k => $field)
-               <div class="mt-2">
-                   <label for="{{$field->FIELD_NAME}}" class="block text-sm font-medium leading-6 text-gray-900">{{$field->id}} {{$field->FIELD_NAME}}</label>
+            @foreach($fields as $k => $field)
+                @if($field->USER_TYPE_ID == 'string')
 
-                   <input data-id="{{$field->id}}" type="text" name="{{$field->FIELD_NAME}}" id="{{$field->FIELD_NAME}}"
-                           class="my_frm f{{$k}} block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                   value="">
-                </div>
-@endforeach
-{{--            <label for="TITLE" class="block text-sm font-medium leading-6 text-gray-900">TITLE222</label>--}}
-{{--            <div class="mt-2">--}}
-{{--                <input type="text" name="LEADS[TITLE]" id="TITLE" autocomplete="given-name"--}}
-{{--                       class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">--}}
-{{--                <input type="hidden" name="LEADS[ID]" value="{{ $id }}">--}}
-{{--            </div>--}}
+                    <div class="mt-2">
+                        <h3>{{$field->USER_TYPE_ID}}</h3>
+                        <label for="{{$field->FIELD_NAME}}"
+                               class="block text-sm font-medium leading-6 text-gray-900">{{$field->id}} {{$field->LIST_COLUMN_LABEL}}</label>
+                        <input data-id="{{$field->id}}" type="text" name="{{$field->FIELD_NAME}}"
+                               id="{{$field->FIELD_NAME}}"
+                               class="my_frm f{{$k}} block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                               value="">
+                    </div>
+                @elseif($field->USER_TYPE_ID == 'enumeration')
+
+                    <div class="mt-2">
+                        <h3>{{$field->USER_TYPE_ID}}</h3>
+                        <label for="{{$field->FIELD_NAME}}"
+                               class="block text-sm font-medium leading-6 text-gray-900">{{$field->id}} {{$field->LIST_COLUMN_LABEL}}</label>
+
+                        <select  class="my_frm" id="{{$field->FIELD_NAME}}" data-id="{{$field->id}}" name="{{$field->FIELD_NAME}}">
+                            <!--Supplement an id here instead of using 'name'-->
+                            @foreach($field->lists as $list)
+                                <option value="{{$list->id}}">{{$list->value}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
+            @endforeach
+            {{--            <label for="TITLE" class="block text-sm font-medium leading-6 text-gray-900">TITLE222</label>--}}
+            {{--            <div class="mt-2">--}}
+            {{--                <input type="text" name="LEADS[TITLE]" id="TITLE" autocomplete="given-name"--}}
+            {{--                       class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">--}}
+            {{--                <input type="hidden" name="LEADS[ID]" value="{{ $id }}">--}}
+            {{--            </div>--}}
 
             <input type="hidden" name="LEADS[ID]" value="{{ $id }}">
             <input type="hidden" name="DOMAIN" value="{{ $domain }}">
@@ -41,13 +61,14 @@
         </form>
     </div>
 @endsection
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
 <script>
+    window.onload = function () {
 
-
-    window.onload = function() {
         let btn = document.getElementById("check_btn");
-
+        let btn_val = document.getElementById("values_btn");
+        //ОТПРАВКА ЗНАЧЕНИЙ, ПОЛУЧЕНИЕ ПРАВИЛ
         btn.addEventListener("click", function (e) {
 
             const my_frm = document.querySelectorAll(".my_frm");
@@ -55,15 +76,15 @@
             // elem.hidden = true;
             var obj = {};
             my_frm.forEach(el => {
-                obj[el.dataset.id] = el.value;
+
+                // obj[el.dataset.id] = el.value;
                 // el.style.display = "none";
             })
 
-            document.getElementById("el1").innerHTML = my_frm[3].dataset.id;
+            // document.getElementById("el1").innerHTML = my_frm[3].dataset.id;
 
-
-            axios.post('/api/rules',obj).then(res => {
-                     document.getElementById("el1").innerHTML = JSON.stringify(res.data);
+            axios.post('/api/rules', obj).then(res => {
+                document.getElementById("el1").innerHTML = JSON.stringify(res.data);
 
                 for (k in res.data) {
                     for (key in res.data[k]) {
@@ -80,15 +101,36 @@
 
 
                 }
-                    //    document.getElementById("el1").innerHTML = my_frm[0].value;
-                })
-                .catch(err =>  {
-                       document.getElementById("el1").innerHTML = err
+                //    document.getElementById("el1").innerHTML = my_frm[0].value;
+            })
+                .catch(err => {
+                    document.getElementById("el1").innerHTML = err
                 });
         });
 
+        //СОХРАНЕНИЕ ЗНАЧЕНИЙ
+        btn_val.addEventListener("click", function (e) {
+            console.log(789);
+            var my_frm = document.querySelectorAll(".my_frm");
+            // console.log(my_frm);
+            var obj = {};
+            const member_id = 'e06846e3d3560fffef5142c3fff0a8f6';
+            obj['member_id'] = member_id;
+            obj['ENTITY_VALUE_ID'] = '{{$id}}';
+            my_frm.forEach(el => {
 
-
+                obj[el.dataset.id] = el.value;
+                // el.style.display = "none";
+            })
+            console.log(obj);
+            axios.post('/laravel/api/leads/values', obj).then(res => {
+                console.log(JSON.stringify(res.data));
+                console.log(987);
+            })
+                .catch(err => {
+                    console.log(err);
+                });
+        });
     }
 
 
