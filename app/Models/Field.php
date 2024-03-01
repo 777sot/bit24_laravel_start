@@ -15,4 +15,8 @@ class Field extends Model
     {
         return $this->hasMany(ListField::class, 'field_id', 'id');
     }
+    public function values()
+    {
+        return $this->hasMany(Value::class, 'field_id', 'id');
+    }
 }

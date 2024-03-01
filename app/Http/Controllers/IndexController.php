@@ -42,7 +42,7 @@ class IndexController extends Controller
 //        $upd_field_text = MyB24::CallB24_field_enumeration_upd($request,  "CRM_LEAD", 'MY_LIST_TEST', $update);
 //        dd($upd_field_text);
         //УДАЛЕНИЕ ПОЛЯ В БИТРИКС
-//        $del_field = MyB24::CallB24_field_del($request, "CRM_LEAD", 'ENUMERATION_2');
+//        $del_field = MyB24::CallB24_field_del($request, "CRM_LEAD", 'ENUMERATION_1');
 //        dd($del_field);
         //СПИСОК ПОЛЬЗОВАТЕЛЬСКИХ ПОЛЕЙ СПИСОК
 //        $usr_field_list = MyB24::CallB24_field_list($request,  "CRM_LEAD", );

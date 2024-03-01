@@ -66,6 +66,13 @@ class RulesController extends Controller
         $setting = Setting::where('member_id', $data['member_id'])->first();
 
         foreach ($fields as $field) {
+
+
+            if(isset($field->show)){
+                $data['show'] = $field->show;
+            }
+
+
             $field_val = Field::find($field->field_id);
 
             if (!$field_val) {
@@ -82,6 +89,7 @@ class RulesController extends Controller
                     'messages' => "member_id values are not valid",
                 ]);
             }
+
 
 
             foreach ($rules as $rule) {
@@ -252,6 +260,10 @@ class RulesController extends Controller
             $fields = json_decode($fields);
 
             foreach ($fields as $field) {
+
+                if(isset($field->show)){
+                    $data['show'] = $field->show;
+                }
 
                 $field_val = Field::find($field->field_id);
 

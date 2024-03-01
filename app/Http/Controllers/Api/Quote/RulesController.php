@@ -66,6 +66,10 @@ class RulesController extends Controller
 
         foreach ($fields as $field) {
 
+            if(isset($field->show)){
+                $data['show'] = $field->show;
+            }
+
             $field_val = Field::find($field->field_id);
 
             if (!$field_val) {
@@ -203,6 +207,10 @@ class RulesController extends Controller
             $fields = json_decode($fields);
 
             foreach ($fields as $field) {
+
+                if(isset($field->show)){
+                    $data['show'] = $field->show;
+                }
 
                 $field_val = Field::find($field->field_id);
 
