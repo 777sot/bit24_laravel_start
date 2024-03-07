@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('rule_type');
             $table->boolean('show')->default('1');
             $table->string('member_id')->nullable();
+            $table->string('block')->nullable();
             $table->timestamps();
         });
     }

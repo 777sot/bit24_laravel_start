@@ -192,20 +192,20 @@ class Services
     }
 
 
-    public static function checkLeadsFields($request)
+    public static function checkLeadsFields($data)
     {
-        $rules = Rule::all() ?? [];
-        $data = $request->input();
+        $rules = Rule::where('CRM_TYPE', $data['CRM_TYPE'])
+            ->where('member_id', $data['member_id'])->get() ?? [];
         $result = [];
 
         if (count($rules) == 0) {
             return 'Rules empty';
         }
-
+        unset($data['CRM_TYPE']);
+        unset($data['member_id']);
         foreach ($rules as $rule) {
             if ($rule->rule_type == 1) {
                 $result[] = Services::checkFieldsOne($data, $rule);
-
             } elseif ($rule->rule_type == 2) {
                 $result[] = Services::checkFieldsTwo($data, $rule);
             } elseif ($rule->rule_type == 3) {
@@ -218,80 +218,139 @@ class Services
     public static function checkFields($data, $rule, $rule_field)
     {
         $result = [];
-        // 0 => 'РАВНО',
 
-        if ($rule_field['rule'] == 0) {
-
-            if ($data[$rule_field['id']] == $rule_field['text']) {
-                $value = $data[$rule_field['id']];
-                $result[$rule_field['id']] = [
-                    'show' => $rule->show,
-                    'check' => 1,
-                    'value' => $value
-                ];
-                $result['check_rule_field'] = 1;
+        if (isset($data[$rule_field['id']])) {
+            $field = Field::find($rule_field['id']);
+            // 0 => 'РАВНО',
+            if ($rule_field['rule'] == 0) {
+                if ($field->MULTIPLE == 1) {
+                    foreach ($data[$rule_field['id']] as $data_mult) {
+                        if ($data_mult == $rule_field['text']) {
+                            $value = $data[$rule_field['id']];
+                            $result[$rule_field['id']] = [
+                                'show' => $rule->show,
+                                'check' => 1,
+                                'value' => $value
+                            ];
+                            $result['check_rule_field'] = 1;
+                            break;
+                        }
+                    }
+                } else {
+                    if ($data[$rule_field['id']] == $rule_field['text']) {
+                        $value = $data[$rule_field['id']];
+                        $result[$rule_field['id']] = [
+                            'show' => $rule->show,
+                            'check' => 1,
+                            'value' => $value
+                        ];
+                        $result['check_rule_field'] = 1;
+                    }
+                }
             }
-        }
 //        1 => 'НЕ РАВНО',
-        if ($rule_field['rule'] == 1) {
-            if ($data[$rule_field['id']] !== $rule_field['text']) {
-                $value = $data[$rule_field['id']];
-                $result[$rule_field['id']] = [
-                    'show' => $rule->show,
-                    'check' => 1,
-                    'value' => $value
-                ];
-                $result['check_rule_field'] = 1;
+            if ($rule_field['rule'] == 1) {
+                if ($field->MULTIPLE == 1) {
+                    foreach ($data[$rule_field['id']] as $data_mult) {
+                        if ($data_mult !== $rule_field['text']) {
+                            $value = $data[$rule_field['id']];
+                            $result[$rule_field['id']] = [
+                                'show' => $rule->show,
+                                'check' => 1,
+                                'value' => $value
+                            ];
+                            $result['check_rule_field'] = 1;
+                            break;
+                        }
+                    }
+                } else {
+                    if ($data[$rule_field['id']] !== $rule_field['text']) {
+                        $value = $data[$rule_field['id']];
+                        $result[$rule_field['id']] = [
+                            'show' => $rule->show,
+                            'check' => 1,
+                            'value' => $value
+                        ];
+                        $result['check_rule_field'] = 1;
+                    }
+                }
+
             }
-        }
-        //        2 => 'НЕ ЗАПОЛНЕНО',
-        if ($rule_field['rule'] == 2) {
-            if (empty($data[$rule_field['id']])) {
-                $value = $data[$rule_field['id']];
-                $result[$rule_field['id']] = [
-                    'show' => $rule->show,
-                    'check' => 1,
-                    'value' => $value
-                ];
-                $result['check_rule_field'] = 1;
+            //        2 => 'НЕ ЗАПОЛНЕНО',
+            if ($rule_field['rule'] == 2) {
+                if ($field->MULTIPLE == 1) {
+                    if (count($data[$rule_field['id']]) < 1) {
+                        $value = $data[$rule_field['id']];
+                        $result[$rule_field['id']] = [
+                            'show' => $rule->show,
+                            'check' => 1,
+                            'value' => $value
+                        ];
+                        $result['check_rule_field'] = 1;
+                    }
+                } else {
+                    if (empty($data[$rule_field['id']])) {
+                        $value = $data[$rule_field['id']];
+                        $result[$rule_field['id']] = [
+                            'show' => $rule->show,
+                            'check' => 1,
+                            'value' => $value
+                        ];
+                        $result['check_rule_field'] = 1;
+                    }
+                }
             }
-        }
-        //        3 => 'ЗАПОЛНЕНО',
-        if ($rule_field['rule'] == 3) {
-            if (!empty($data[$rule_field['id']])) {
-                $value = $data[$rule_field['id']];
-                $result[$rule_field['id']] = [
-                    'show' => $rule->show,
-                    'check' => 1,
-                    'value' => $value
-                ];
-                $result['check_rule_field'] = 1;
+            //        3 => 'ЗАПОЛНЕНО',
+            if ($rule_field['rule'] == 3) {
+                if ($field->MULTIPLE == 1) {
+                    if (count($data[$rule_field['id']]) > 0) {
+                        $value = $data[$rule_field['id']];
+                        $result[$rule_field['id']] = [
+                            'show' => $rule->show,
+                            'check' => 1,
+                            'value' => $value
+                        ];
+                        $result['check_rule_field'] = 1;
+                    }
+                } else {
+                    if (!empty($data[$rule_field['id']])) {
+                        $value = $data[$rule_field['id']];
+                        $result[$rule_field['id']] = [
+                            'show' => $rule->show,
+                            'check' => 1,
+                            'value' => $value
+                        ];
+                        $result['check_rule_field'] = 1;
+                    }
+                }
+
             }
-        }
-        //        4 => 'СОДЕРЖИТ',
-        if ($rule_field['rule'] == 4) {
-            if ((strpos($data[$rule_field['id']], $rule_field['text']) !== false)) {
-                $value = $data[$rule_field['id']];
-                $result[$rule_field['id']] = [
-                    'show' => $rule->show,
-                    'check' => 1,
-                    'value' => $value
-                ];
-                $result['check_rule_field'] = 1;
+            //        4 => 'СОДЕРЖИТ',
+            if ($rule_field['rule'] == 4) {
+                if ((strpos($data[$rule_field['id']], $rule_field['text']) !== false)) {
+                    $value = $data[$rule_field['id']];
+                    $result[$rule_field['id']] = [
+                        'show' => $rule->show,
+                        'check' => 1,
+                        'value' => $value
+                    ];
+                    $result['check_rule_field'] = 1;
+                }
             }
-        }
-        //       5 => 'НЕ СОДЕРЖИТ',
-        if ($rule_field['rule'] == 5) {
-            if ((strpos($data[$rule_field['id']], $rule_field['text']) === false)) {
-                $value = $data[$rule_field['id']];
-                $result[$rule_field['id']] = [
-                    'show' => $rule->show,
-                    'check' => 1,
-                    'value' => $value
-                ];
-                $result['check_rule_field'] = 1;
+            //       5 => 'НЕ СОДЕРЖИТ',
+            if ($rule_field['rule'] == 5) {
+                if ((strpos($data[$rule_field['id']], $rule_field['text']) === false)) {
+                    $value = $data[$rule_field['id']];
+                    $result[$rule_field['id']] = [
+                        'show' => $rule->show,
+                        'check' => 1,
+                        'value' => $value
+                    ];
+                    $result['check_rule_field'] = 1;
+                }
             }
-        }
+
+        };
 
         return $result;
     }
@@ -381,11 +440,11 @@ class Services
             'НЕ СОДЕРЖИТ' => '5',
         ];
 
-        if (!empty($id_num)) {
-            return in_array($id_num, $rules_fields) ? true : false;
+        if ($id_num === null) {
+            return $rules_fields;
         }
 
-        return $rules_fields;
+        return array_search($id_num, $rules_fields);
     }
 
     public static function type_fields($type_field = null)
@@ -411,7 +470,7 @@ class Services
         ];
 
         if (!empty($type_rule)) {
-            return in_array($type_rule, $type) ? true : false;
+            return in_array($type_rule, $type) ? array_search($type_rule, $type) : array_search($type_rule, $type);
         }
 
         return $type;

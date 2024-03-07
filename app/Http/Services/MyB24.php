@@ -605,6 +605,8 @@ class MyB24
             return false;
         }
 
+        $data = Setting::where('member_id', $add['member_id'])->first();
+
         $multiple = ($add['MULTIPLE']) ? "Y" : "N";
 
         $method = '';
@@ -708,6 +710,9 @@ class MyB24
         if (!$res) {
             return false;
         }
+
+        $data = Setting::where('member_id', $update['member_id'])->first();
+
         $method = '';
 
         switch ($crm_type) {
@@ -757,6 +762,8 @@ class MyB24
         $multiple = ($update['MULTIPLE']) ? "Y" : "N";
 
         $del_field = MyB24::CallB24_field_del_new($crm_type, $update['member_id'], $ID_del);
+
+        $data = Setting::where('member_id', $update['member_id'])->first();
 
         $method = '';
 
@@ -1045,6 +1052,9 @@ class MyB24
         if (!$res) {
             return false;
         }
+
+        $data = Setting::where('member_id', $update['member_id'])->first();
+
         $method = '';
 
         switch ($crm_type) {

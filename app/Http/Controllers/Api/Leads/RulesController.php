@@ -392,6 +392,9 @@ class RulesController extends Controller
             }
         }
 
-        return Services::checkLeadsFields($request);
+        $data['CRM_TYPE'] = 'CRM_LEAD';
+        $data['member_id'] = 'e06846e3d3560fffef5142c3fff0a8f6';
+
+        return Services::checkLeadsFields($data);
     }
 }

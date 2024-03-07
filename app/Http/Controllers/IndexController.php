@@ -42,11 +42,11 @@ class IndexController extends Controller
 //        $upd_field_text = MyB24::CallB24_field_enumeration_upd($request,  "CRM_LEAD", 'MY_LIST_TEST', $update);
 //        dd($upd_field_text);
         //УДАЛЕНИЕ ПОЛЯ В БИТРИКС
-//        $del_field = MyB24::CallB24_field_del($request, "CRM_LEAD", 'ENUMERATION_1');
+        $del_field = MyB24::CallB24_field_del($request, "CRM_LEAD", 'STRING_8');
 //        dd($del_field);
         //СПИСОК ПОЛЬЗОВАТЕЛЬСКИХ ПОЛЕЙ СПИСОК
-//        $usr_field_list = MyB24::CallB24_field_list($request,  "CRM_LEAD", );
-//        dd($usr_field_list);
+        $usr_field_list = MyB24::CallB24_field_list($request,  "CRM_LEAD", );
+        dd($usr_field_list);
         //ДОБАВЛЕНИЕ ПОЛЯ СПИСОК
 
         //ДОБАВЛЕНИЕ ПОЛЯ СПИСОК (МНОЖЕСТВЕННЫЙ)
@@ -75,9 +75,9 @@ class IndexController extends Controller
         $crm_type = "CRM_LEAD";
         $res['member_id'] = "e06846e3d3560fffef5142c3fff0a8f6";
         $res['ENTITY_VALUE_ID'] = "2";
-        $get = MyB24::CallB24_get_crm($crm_type, $res);
-
-        dd($get);
+//        $get = MyB24::CallB24_get_crm($crm_type, $res);
+//
+//        dd($get);
 
 
         Log::info("INDEX");

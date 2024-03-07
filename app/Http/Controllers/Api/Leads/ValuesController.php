@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api\Leads;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\Leads\ValueResource;
 use App\Http\Services\MyB24;
+use App\Http\Services\Services;
 use App\Models\Field;
 use App\Models\ListField;
 use App\Models\Value;
@@ -25,17 +27,13 @@ class ValuesController extends Controller
     public function store(Request $request)
     {
         $data = $request->input();
-
         $member_id = $data['member_id'];
         $ENTITY_VALUE_ID = $data['ENTITY_VALUE_ID'];
-//        return $ENTITY_VALUE_ID;
         foreach ($data as $k => $value) {
             if ($k == 'member_id' || $k == 'ENTITY_VALUE_ID') continue;
             $field = Field::where('member_id', $member_id)->where('CRM_TYPE', 'CRM_LEAD')->find($k);
-
             if ($field) {
                 if ($field->USER_TYPE_ID == 'string') {
-
                     $value = Value::updateOrCreate(
                         [
                             'field_id' => $field->id,
@@ -49,7 +47,7 @@ class ValuesController extends Controller
                         'BTX_ID' => $field->BTX_ID,
                     ]);
                 } elseif ($field->USER_TYPE_ID == 'enumeration' && $field->MULTIPLE == 0) {
-                    $list = ListField::find($value);
+                    $list = ListField::where('BTX_ID', $value)->first();
                     if ($list) {
                         $value = Value::updateOrCreate(
                             [
@@ -68,12 +66,11 @@ class ValuesController extends Controller
                 } elseif ($field->USER_TYPE_ID == 'enumeration' && $field->MULTIPLE == 1) {
                     $multi = [];
                     foreach ($value as $val){
-                        $list = ListField::find($val);
+                        $list = ListField::where('BTX_ID', $val)->first();
                         if($list){
                             $multi[] = $list->BTX_ID;
                         }
                     }
-//                    return json_encode($multi);
                         $value = Value::updateOrCreate(
                             [
                                 'field_id' => $field->id,
@@ -89,34 +86,113 @@ class ValuesController extends Controller
                 }
 
             };
-
-
         }
-
         $new_values = Value::where('member_id', $member_id)->where('CRM_TYPE', 'CRM_LEAD')->where('ENTITY_VALUE_ID', $ENTITY_VALUE_ID)->get();
         $values_data = [];
+        $results = [];
+
+        foreach ($new_values as $value){
+            $results[$value->field_id] = $value->VALUE;
+        }
+        $results['CRM_TYPE'] = 'CRM_LEAD';
+        $results['member_id'] = 'e06846e3d3560fffef5142c3fff0a8f6';
+
+        $checks =  Services::checkLeadsFields($results);
+        $check_res = [];
+        foreach ($checks as $check){
+            foreach ($check as $k => $ch){
+                $check_res[$k] = $ch;
+            }
+        }
+       $response_data = [];
         foreach ($new_values as $val) {
+            if (array_key_exists($val->field_id, $check_res)) {
+                $response_data[$val->field_id] = $check_res[$val->field_id]['show'];
+                $response_data[$val->field_id] = [
+                    'field_id' => $val->field_id,
+                    'show' => $check_res[$val->field_id]['show'],
+                    'value' => $val->VALUE,
+                ];
+            }else{
+                $response_data[$val->field_id] = [
+                    'field_id' => $val->field_id,
+                    'show' => 1,
+                    'value' => $val->VALUE,
+                ];
+            }
             if($val->field->MULTIPLE == 1){
                 $values_data["UF_CRM_" . $val->field->FIELD_NAME] = json_decode($val->VALUE);
                 continue;
             };
             $values_data["UF_CRM_" . $val->field->FIELD_NAME] = $val->VALUE;
         }
-
         $update = [];
         $update['ENTITY_VALUE_ID'] = $ENTITY_VALUE_ID;
         $update['member_id'] = $member_id;
         $update['values_data'] = $values_data;
         $res = MyB24::CallB24_upd_values('CRM_LEAD', $update);
-        return $res;
+        return $response_data;
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
-        //
+        $data = $request->input();
+
+        $values = Value::where("CRM_TYPE", "CRM_LEAD")
+            ->where("member_id", $data['member_id'])
+            ->where("ENTITY_VALUE_ID", $id)
+            ->get();
+
+        $results = [];
+
+        foreach ($values as $value){
+            $results[$value->field_id] = $value->VALUE;
+        }
+
+        $results['CRM_TYPE'] = 'CRM_LEAD';
+        $results['member_id'] = 'e06846e3d3560fffef5142c3fff0a8f6';
+
+        $checks =  Services::checkLeadsFields($results);
+        $check_res = [];
+        foreach ($checks as $check){
+            foreach ($check as $k => $ch){
+                $check_res[$k] = $ch;
+            }
+        }
+
+        $response_data = [];
+
+        $fields = Field::where("CRM_TYPE", "CRM_LEAD")
+            ->where("member_id", $data['member_id'])
+            ->get();
+
+        foreach ($fields as $field){
+
+            $val = Value::where("CRM_TYPE", "CRM_LEAD")
+                ->where("member_id", $data['member_id'])
+                ->where("ENTITY_VALUE_ID", $id)
+                ->where("field_id", $field->id)
+                ->first();
+
+            if (array_key_exists($field->id, $check_res)) {
+                $response_data[] = [
+                    'field_id' => $field->id,
+                    'show' => $check_res[$field->id]['show'],
+                    'VALUE' => ($val->VALUE) ? $val->VALUE : "",
+                ];
+            }else{
+                $response_data[] = [
+                    'field_id' => $field->id,
+                    'show' => 1,
+                    'VALUE' =>  ($val->VALUE) ? $val->VALUE : "",
+                ];
+            }
+        }
+
+        return $response_data;
     }
 
     /**

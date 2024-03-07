@@ -25,104 +25,17 @@
     <script src="//api.bitrix24.com/api/v1/"></script>
     <script>
         window.onload = function () {
+            console.log('start', BX24.getAuth());
 
-
-            let data = qs.stringify({
-                'LIST_COLUMN_LABEL': 'новый список 333',
-                'LIST': '[ { "VALUE": "Элемент #12" }, { "VALUE": "Элемент #23" }, { "VALUE": "Элемент #3" }, { "VALUE": "Элемент #4" }, { "VALUE": "Элемент #5" } ]',
-                'USER_TYPE_ID': 'enumeration',
-                'MULTIPLE': '1'
+            BX24.init(function(){
+                console.log('init', BX24.isAdmin());
+                console.log('IN INIT', BX24.getAuth());
             });
 
-            let config = {
-                method: 'post',
-                maxBodyLength: Infinity,
-                url: 'https://bitb24.ru/api/leads/fields/',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                data : data
-            };
+            setTimeout(() => {
+                console.log('timeout', BX24.getAuth());
+            }, 3000);
 
-            axios.request(config)
-                .then((response) => {
-                    console.log(JSON.stringify(response.data));
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-
-
-            console.log(BX24.getAuth());
-
-            BX24.callMethod(
-                "user.current",
-                {},
-                function(result)
-                {
-                    if(result.error())
-                        console.error(result.error());
-                    else
-                        console.dir(result.data());
-                }
-            );
-
-
-            axios.post('/api/rules')
-                .then(res => {
-                    document.getElementById("el1").innerHTML = res.data;
-                })
-                .catch(err => {
-                    document.getElementById("el1").innerHTML = err
-                });
-
-            document.getElementById("btn_form1").addEventListener("click", function (e) {
-
-                axios.post('{{ route('addrules.leads', 1) }}',{
-                    'field_id':1,
-                    'rule_type':1,
-                    'rule_field_id':2,
-                    'rule':2,
-                    'text':'abc',
-                    'show':1,
-                }).then(res => {
-                    document.getElementById("el1").innerHTML = JSON.stringify(res.data);
-
-                })
-                    .catch(err =>  {
-                        document.getElementById("el1").innerHTML = err
-                    });
-            });
-
-            document.getElementById("btn_form2").addEventListener("click", function (e) {
-                var obj = [
-                    {
-                        'field_id':1,
-                        'rule_type':2,
-                        'rule_field_id':2,
-                        'rule':2,
-                        'text':'abc',
-                        'show':1,
-                },
-                    {
-                        'field_id':1,
-                        'rule_type':2,
-                        'rule_field_id':3,
-                        'rule':2,
-                        'text':'abcddv',
-                        'show':1,
-                },
-
-                ];
-
-                axios.post('{{ route('addrules.leads', 2) }}',obj).then(res => {
-                    document.getElementById("el1").innerHTML = JSON.stringify(res.data);
-
-                })
-                    .catch(err =>  {
-                        document.getElementById("el1").innerHTML = err
-                    });
-            });
         }
 
 

@@ -70,10 +70,14 @@ Route::get('/contacts/rules', [\App\Http\Controllers\Api\Contact\RulesController
 Route::post('/contacts/rules', [\App\Http\Controllers\Api\Contact\RulesController::class, 'store'])->name('contacts.rules.store');
 //ОБНОВЛЕНИЕ ПРАВИЛА ДЛЯ КОНТАКТА
 Route::patch('/contacts/rules/{id}', [\App\Http\Controllers\Api\Contact\RulesController::class, 'update'])->name('contacts.rules.update');
+//ОБНОВЛЕНИЕ ПРАВИЛ БЛОКА ДЛЯ КОНТАКТА
+Route::patch('/contacts/rulesblock/{id}', [\App\Http\Controllers\Api\Contact\RulesController::class, 'updateblock'])->name('contacts.rules.updateblock');
 //ПОЛУЧЕНИЕ ПРАВИЛА ДЛЯ КОНТАКТА
 Route::get('/contacts/rules/{id}', [\App\Http\Controllers\Api\Contact\RulesController::class, 'show'])->name('contacts.rules.show');
 //УДАЛЕНИЕ ПРАВИЛА ДЛЯ КОНТАКТА
 Route::delete('/contacts/rules/{id}', [\App\Http\Controllers\Api\Contact\RulesController::class, 'destroy'])->name('contacts.rules.destroy');
+//УДАЛЕНИЕ БЛОКА ПРАВИЛ ДЛЯ КОНТАКТА
+Route::delete('/contacts/rulesblock/{id}', [\App\Http\Controllers\Api\Contact\RulesController::class, 'destroyblock'])->name('contacts.rules.destroyblock');
 //ПРОВЕРКА ПРАВИЛ ДЛЯ КОНТАКТА
 Route::post('/contacts/check_rules', [\App\Http\Controllers\Api\Contact\RulesController::class, 'check_rules'])->name('contacts.rules.check_rules');
 //

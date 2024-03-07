@@ -26,7 +26,7 @@ class UpdateRequest extends FormRequest
         return [
             'fields' => 'required|string',
             'rule' => 'required|string',
-            'rule_type' => 'required|string',
+            'rule_type' => 'string',
             'show' => 'string|boolean',
             'member_id' => 'required|string|exists:App\Models\Setting,member_id',
         ];
