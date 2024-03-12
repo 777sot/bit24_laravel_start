@@ -130,7 +130,6 @@ class FieldsController extends Controller
      */
     public function show(ShowRequest $request, string $id)
     {
-
         $data = $request->validated();
 
         $field = Field::find($id);
@@ -179,7 +178,6 @@ class FieldsController extends Controller
                     ]);
                 }
             }
-
 
             $data['EDIT_FORM_LABEL'] = $data['LIST_COLUMN_LABEL'];
             $field->update($data);

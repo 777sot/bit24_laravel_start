@@ -42,9 +42,49 @@
         <button type="button" id="values_btn" class="btn btn-danger">СОХРАНИТЬ ЗНАЧЕНИЯ</button>
     </div>
 @endsection
+<script src="//api.bitrix24.com/api/v1/"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
     window.onload = function () {
+        var b24_member_id;
+        var b24_placement_info;
+        var url_set;
+        var url_get;
+        BX24.init(function(){
+            console.log('Auth',BX24.getAuth());
+            let dataB24 = BX24.getAuth();
+            console.log('member_id', dataB24.member_id );
+            console.log('placement.info()', BX24.placement.info());
+            b24_placement_info = BX24.placement.info();
+            console.log('ENTITY_ID', b24_placement_info.options.ENTITY_ID);
+            switch (b24_placement_info.options.ENTITY_ID) {
+                case "CRM_CONTACT":
+                    console.log("CRM_CONTACT");
+                    url_set = '/laravel/api/contacts/values'
+                    url_get = '/laravel/api/contacts/values/'+b24_placement_info.options.ENTITY_VALUE_ID
+                    break;
+                case "CRM_LEAD":
+                    url_set = '/laravel/api/leads/values'
+                    url_get = '/laravel/api/leads/values/'+b24_placement_info.options.ENTITY_VALUE_ID
+                    break;
+                case "CRM_COMPANY":
+                    url_set = '/laravel/api/company/values'
+                    url_get = '/laravel/api/company/values/'+b24_placement_info.options.ENTITY_VALUE_ID
+                    break;
+                case "CRM_DEAL":
+                    url_set = '/laravel/api/deal/values'
+                    url_get = '/laravel/api/deal/values/'+b24_placement_info.options.ENTITY_VALUE_ID
+                    break;
+                case "CRM_QUOTE":
+                    url_set = '/laravel/api/quote/values'
+                    url_get = '/laravel/api/quote/values/'+b24_placement_info.options.ENTITY_VALUE_ID
+                    break;
+                default:
+                    console.log("EROOR");
+            }
+            member_id = dataB24.member_id;
+        });
+
         let btn_val = document.getElementById("values_btn");
 //ДОБАВЛЯЕМ И ИЗМЕНЯЕИ МЗНАЧЕНИЯ В БД
         function setValue() {

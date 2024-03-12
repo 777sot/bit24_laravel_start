@@ -18,11 +18,13 @@ class FieldResource extends JsonResource
             'status' => true,
             'id' => $this->id,
             'CRM_TYPE' => $this->CRM_TYPE,
+            'FIELD_NAME' => $this->FIELD_NAME,
             'LIST_COLUMN_LABEL' => $this->LIST_COLUMN_LABEL,
             'USER_TYPE_ID' => $this->USER_TYPE_ID,
             'MULTIPLE' => $this->MULTIPLE,
             'index' => $this->index,
             'member_id' => $this->member_id,
+            'BTX_ID' => $this->BTX_ID,
             "LIST" => ($this->USER_TYPE_ID === "enumeration") ? ListResource::collection($this->lists) : 0
         ];
     }

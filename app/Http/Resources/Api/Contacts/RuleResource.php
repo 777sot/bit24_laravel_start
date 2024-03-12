@@ -54,7 +54,7 @@ class RuleResource extends JsonResource
 //            'controlled_field_id' => new FieldRuleResource(Field::find($this->field_id)),
             'field_right' => $fields,
 //            'show' => $this->show,
-            'fields_left' => $rules,
+            'field_left' => $rules,
         ];
     }
 }

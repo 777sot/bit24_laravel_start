@@ -7,6 +7,7 @@ use App\Http\Requests\Api\Quote\Fields\ShowRequest;
 use App\Http\Requests\Api\Quote\Fields\StoreRequest;
 use App\Http\Requests\Api\Quote\Fields\UpdateRequest;
 use App\Http\Resources\Api\Quote\FieldResource;
+use App\Http\Services\MyB24;
 use App\Models\Field;
 use App\Models\ListField;
 use App\Models\Rule;
@@ -56,6 +57,7 @@ class FieldsController extends Controller
 
         $data['EDIT_FORM_LABEL'] = $data['LIST_COLUMN_LABEL'];
         $data['XML_ID'] = $data['FIELD_NAME'];
+        $data['MULTIPLE'] = $data['MULTIPLE'] ?? 0;
 
         $field = Field::firstOrCreate([
             'LIST_COLUMN_LABEL' => $data['LIST_COLUMN_LABEL'],
@@ -85,8 +87,38 @@ class FieldsController extends Controller
             }
         }
 
-
         if ($field) {
+            //ДОБАВЛЕНИЕ ПОЛЯ В БИТРИКС
+            //  enumeration
+            if ($field->USER_TYPE_ID == 'enumeration') {
+                //ПРОВЕРЯЕМ ПОЛЕ В БИТРИКС
+                if (empty($field->BTX_ID)) {
+                    $add_field_list = MyB24::CallB24_field_enumeration_add_new("CRM_QUOTE", $data);
+                    if (isset($add_field_list['result'])) {
+                        $btx_id = $add_field_list['result'];
+                        $field->BTX_ID = $btx_id;
+                        $field->save();
+                        //ДОБАВЛЕНИЕ LIST BTX_ID
+                        $usr_field_list = MyB24::CallB24_field_list_new("CRM_QUOTE", $field->member_id, $field->BTX_ID);
+                        foreach ($usr_field_list['result']['LIST'] as $btx_list) {
+                            $list_fnd = ListField::where('field_id', $field->id)->where('value', $btx_list['VALUE'])->first();
+                            $list_fnd->BTX_ID = $btx_list['ID'];
+                            $list_fnd->save();
+                        }
+                    }
+                }
+
+            } elseif ($field->USER_TYPE_ID == 'string') {
+                //ПРОВЕРЯЕМ ПОЛЕ В БИТРИКС
+                if (empty($field->BTX_ID)) {
+                    // string
+                    $add_field_text = MyB24::CallB24_field_text_add_new("CRM_QUOTE", $data);
+                    $btx_id = $add_field_text['result'];
+                    $field->BTX_ID = $btx_id;
+                    $field->save();
+                }
+            }
+
             return new FieldResource($field);
         } else {
             return array('data' => ['status' => false]);
@@ -98,7 +130,6 @@ class FieldsController extends Controller
      */
     public function show(ShowRequest $request, string $id)
     {
-
         $data = $request->validated();
 
         $field = Field::find($id);
@@ -148,10 +179,32 @@ class FieldsController extends Controller
                 }
             }
 
-
             $data['EDIT_FORM_LABEL'] = $data['LIST_COLUMN_LABEL'];
             $field->update($data);
             $field->refresh();
+
+            //ОБНОВЛЕНИЕ ПОЛЯ В БИТРИКС
+            //  list
+            if ($field->USER_TYPE_ID == 'enumeration' && !empty($field->BTX_ID)) {
+                $data['FIELD_NAME'] = $field->FIELD_NAME;
+                $data['XML_ID'] = $field->XML_ID;
+                $data['USER_TYPE_ID'] = $field->USER_TYPE_ID;
+                $data['CRM_TYPE'] = $field->CRM_TYPE;
+                $data['MULTIPLE'] = (!empty($data['MULTIPLE'])) ? $data['MULTIPLE'] : $field->MULTIPLE;
+                $add_field_list = MyB24::CallB24_field_enumeration_upd_new("CRM_QUOTE", $data, $field->BTX_ID);
+                if (isset($add_field_list['result'])) {
+                    $btx_id = $add_field_list['result'];
+                    $field->BTX_ID = $btx_id;
+                }
+                $field->save();
+
+            }
+            //  list
+            if ($field->USER_TYPE_ID == 'string' && !empty($field->BTX_ID)) {
+                $data['BTX_ID'] = $field->BTX_ID;
+                $upd_field_text = MyB24::CallB24_field_text_upd_new("CRM_QUOTE", $data);
+            }
+            ///---
 
             if (!empty($data['LIST'])) {
 
@@ -172,6 +225,14 @@ class FieldsController extends Controller
                         'CRM_TYPE' => $field->CRM_TYPE,
                         'value' => $list->VALUE,
                     ]);
+                }
+
+                //ДОБАВЛЕНИЕ LIST BTX_ID
+                $usr_field_list = MyB24::CallB24_field_list_new("CRM_QUOTE", $field->member_id, $field->BTX_ID);
+                foreach ($usr_field_list['result']['LIST'] as $btx_list) {
+                    $list_fnd = ListField::where('field_id', $field->id)->where('value', $btx_list['VALUE'])->first();
+                    $list_fnd->BTX_ID = $btx_list['ID'];
+                    $list_fnd->save();
                 }
             }
 
@@ -227,7 +288,14 @@ class FieldsController extends Controller
                 ]);
             }
 
+            if (!empty($field->BTX_ID)) {
+                //УДАЛЕНИЕ ПОЛЯ В БИТРИКС
+                $del_field = MyB24::CallB24_field_del_new("CRM_QUOTE", $field->member_id, $field->BTX_ID);
+                ///---
+            }
+
             $field->lists()->delete();
+            $field->values()->delete();
             $field->delete();
 
 
@@ -243,6 +311,9 @@ class FieldsController extends Controller
         }
     }
 
+    /**
+     * Remove the specified resource from storage.
+     */
     public function update_index(Request $request)
     {
         $data = $request->input();
@@ -282,7 +353,7 @@ class FieldsController extends Controller
             ]);
         }
 
-        $fields = Field::where('CRM_TYPE', "CRM_QUOTE")->get();
+        $fields = Field::where('CRM_TYPE', "CRM_DEAL")->get();
 
         return FieldResource::collection($fields);
     }

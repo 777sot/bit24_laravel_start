@@ -38,10 +38,7 @@ class RulesController extends Controller
         return [
             'data' => [...$rules_arr],
         ];
-
-//        return RuleResource::collection($rules_arr);
     }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -363,6 +360,42 @@ class RulesController extends Controller
         }
 
         return Services::checkLeadsFields($request);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function indexblock(ShowRequest $request, string $id)
+    {
+        $data = $request->validated();
+
+        $rules = Rule::where('CRM_TYPE', 'CRM_CONTACT')
+            ->where('member_id', $data['member_id'])
+            ->where('block', $id)
+            ->get();
+
+        if (count($rules) > 0) {
+
+            $rules_arr = [];
+
+            foreach ($rules as $rule) {
+                if (empty($rules_arr[$rule->block])) {
+                    $rules_arr[$rule->block] = new RuleResource($rule);
+                }
+            }
+
+            return [
+                'data' => [...$rules_arr],
+            ];
+
+        } else {
+            return array('data' => [
+                'status' => false,
+                'messages' => 'RuleBLOCK is not found',
+            ]);
+        }
+
+
     }
 
 

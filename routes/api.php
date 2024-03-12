@@ -32,6 +32,12 @@ Route::get('/leads/rules/{id}', [\App\Http\Controllers\Api\Leads\RulesController
 Route::delete('/leads/rules/{id}', [\App\Http\Controllers\Api\Leads\RulesController::class, 'destroy'])->name('leads.rules.destroy');
 //ПРОВЕРКА ПРАВИЛ ДЛЯ ЛИДОВ
 Route::post('/leads/check_rules', [\App\Http\Controllers\Api\Leads\RulesController::class, 'check_rules'])->name('leads.rules.check_rules');
+//ПРАВИЛ БЛОКА ДЛЯ КОНТАКТА ПО ID
+Route::get('/leads/rulesblock/{id}', [\App\Http\Controllers\Api\Leads\RulesController::class, 'indexblock'])->name('leads.rules.indexblock');
+//ОБНОВЛЕНИЕ ПРАВИЛ БЛОКА ДЛЯ КОНТАКТА
+Route::patch('/leads/rulesblock/{id}', [\App\Http\Controllers\Api\Leads\RulesController::class, 'updateblock'])->name('leads.rules.updateblock');
+//УДАЛЕНИЕ БЛОКА ПРАВИЛ ДЛЯ КОНТАКТА
+Route::delete('/leads/rulesblock/{id}', [\App\Http\Controllers\Api\Leads\RulesController::class, 'destroyblock'])->name('leads.rules.destroyblock');
 //
 
 //TODO ПОЛЯ ДЛЯ ЛИДА
@@ -70,16 +76,19 @@ Route::get('/contacts/rules', [\App\Http\Controllers\Api\Contact\RulesController
 Route::post('/contacts/rules', [\App\Http\Controllers\Api\Contact\RulesController::class, 'store'])->name('contacts.rules.store');
 //ОБНОВЛЕНИЕ ПРАВИЛА ДЛЯ КОНТАКТА
 Route::patch('/contacts/rules/{id}', [\App\Http\Controllers\Api\Contact\RulesController::class, 'update'])->name('contacts.rules.update');
-//ОБНОВЛЕНИЕ ПРАВИЛ БЛОКА ДЛЯ КОНТАКТА
-Route::patch('/contacts/rulesblock/{id}', [\App\Http\Controllers\Api\Contact\RulesController::class, 'updateblock'])->name('contacts.rules.updateblock');
 //ПОЛУЧЕНИЕ ПРАВИЛА ДЛЯ КОНТАКТА
 Route::get('/contacts/rules/{id}', [\App\Http\Controllers\Api\Contact\RulesController::class, 'show'])->name('contacts.rules.show');
 //УДАЛЕНИЕ ПРАВИЛА ДЛЯ КОНТАКТА
 Route::delete('/contacts/rules/{id}', [\App\Http\Controllers\Api\Contact\RulesController::class, 'destroy'])->name('contacts.rules.destroy');
-//УДАЛЕНИЕ БЛОКА ПРАВИЛ ДЛЯ КОНТАКТА
-Route::delete('/contacts/rulesblock/{id}', [\App\Http\Controllers\Api\Contact\RulesController::class, 'destroyblock'])->name('contacts.rules.destroyblock');
 //ПРОВЕРКА ПРАВИЛ ДЛЯ КОНТАКТА
 Route::post('/contacts/check_rules', [\App\Http\Controllers\Api\Contact\RulesController::class, 'check_rules'])->name('contacts.rules.check_rules');
+//ПРАВИЛ БЛОКА ДЛЯ КОНТАКТА ПО ID
+Route::get('/contacts/rulesblock/{id}', [\App\Http\Controllers\Api\Contact\RulesController::class, 'indexblock'])->name('contacts.rules.indexblock');
+//ОБНОВЛЕНИЕ ПРАВИЛ БЛОКА ДЛЯ КОНТАКТА
+Route::patch('/contacts/rulesblock/{id}', [\App\Http\Controllers\Api\Contact\RulesController::class, 'updateblock'])->name('contacts.rules.updateblock');
+//УДАЛЕНИЕ БЛОКА ПРАВИЛ ДЛЯ КОНТАКТА
+Route::delete('/contacts/rulesblock/{id}', [\App\Http\Controllers\Api\Contact\RulesController::class, 'destroyblock'])->name('contacts.rules.destroyblock');
+
 //
 //TODO ПОЛЯ ДЛЯ КОНТАКТА
 //ВЫВОД ПОЛЕЙ ДЛЯ КОНТАКТА
@@ -96,6 +105,19 @@ Route::delete('/contacts/fields/{field}', [\App\Http\Controllers\Api\Contact\Fie
 Route::post('/contacts/update_index', [\App\Http\Controllers\Api\Contact\FieldsController::class, 'update_index'])->name('contacts.fields.update_index');
 //-----------
 //----------------
+//TODO ЗНАЧЕНИЯ ДЛЯ КОНТАКТА
+//ВЫВОД ЗНАЧЕНИЙ ДЛЯ КОНТАКТА
+Route::get('/contacts/values', [\App\Http\Controllers\Api\Contact\ValuesController::class, 'index'])->name('contacts.values.index');
+//ДОБАВЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ КОНТАКТА
+Route::post('/contacts/values', [\App\Http\Controllers\Api\Contact\ValuesController::class, 'store'])->name('contacts.values.store');
+//ОБНОВЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ КОНТАКТА
+Route::patch('/contacts/values/{id}', [\App\Http\Controllers\Api\Contact\ValuesController::class, 'update'])->name('contacts.values.update');
+//ПОЛУЧЕНИЯ ЗНАЧЕНИЙ ДЛЯ КОНТАКТА
+Route::get('/contacts/values/{id}', [\App\Http\Controllers\Api\Contact\ValuesController::class, 'show'])->name('contacts.values.show');
+//УДАЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ КОНТАКТА
+Route::delete('/contacts/values/{field}', [\App\Http\Controllers\Api\Contact\ValuesController::class, 'destroy'])->name('contacts.values.destroy');
+//-----------
+//-----------
 
 //TODO ПРАВИЛА ДЛЯ КОМПАНИИ
 //ВЫВОД ПРАВИЛ ДЛЯ КОМПАНИИ
@@ -110,6 +132,13 @@ Route::get('/company/rules/{id}', [\App\Http\Controllers\Api\Company\RulesContro
 Route::delete('/company/rules/{id}', [\App\Http\Controllers\Api\Company\RulesController::class, 'destroy'])->name('company.rules.destroy');
 //ПРОВЕРКА ПРАВИЛ ДЛЯ КОМПАНИИ
 Route::post('/company/check_rules', [\App\Http\Controllers\Api\Company\RulesController::class, 'check_rules'])->name('company.rules.check_rules');
+//ПРАВИЛ БЛОКА ДЛЯ КОНТАКТА ПО ID
+Route::get('/company/rulesblock/{id}', [\App\Http\Controllers\Api\Company\RulesController::class, 'indexblock'])->name('company.rules.indexblock');
+//ОБНОВЛЕНИЕ ПРАВИЛ БЛОКА ДЛЯ КОНТАКТА
+Route::patch('/company/rulesblock/{id}', [\App\Http\Controllers\Api\Company\RulesController::class, 'updateblock'])->name('company.rules.updateblock');
+//УДАЛЕНИЕ БЛОКА ПРАВИЛ ДЛЯ КОНТАКТА
+Route::delete('/company/rulesblock/{id}', [\App\Http\Controllers\Api\Company\RulesController::class, 'destroyblock'])->name('company.rules.destroyblock');
+
 //
 //TODO ПОЛЯ ДЛЯ КОМПАНИИ
 //ВЫВОД ПОЛЕЙ ДЛЯ КОМПАНИИ
@@ -126,6 +155,19 @@ Route::delete('/company/fields/{field}', [\App\Http\Controllers\Api\Company\Fiel
 Route::post('/company/update_index', [\App\Http\Controllers\Api\Company\FieldsController::class, 'update_index'])->name('company.fields.update_index');
 //-----------
 //----------------
+//TODO ЗНАЧЕНИЯ ДЛЯ КОМПАНИИ
+//ВЫВОД ЗНАЧЕНИЙ ДЛЯ КОМПАНИИ
+Route::get('/company/values', [\App\Http\Controllers\Api\Company\ValuesController::class, 'index'])->name('company.values.index');
+//ДОБАВЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ КОМПАНИИ
+Route::post('/company/values', [\App\Http\Controllers\Api\Company\ValuesController::class, 'store'])->name('company.values.store');
+//ОБНОВЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ КОМПАНИИ
+Route::patch('/company/values/{id}', [\App\Http\Controllers\Api\Company\ValuesController::class, 'update'])->name('company.values.update');
+//ПОЛУЧЕНИЯ ЗНАЧЕНИЙ ДЛЯ КОМПАНИИ
+Route::get('/company/values/{id}', [\App\Http\Controllers\Api\Company\ValuesController::class, 'show'])->name('company.values.show');
+//УДАЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ КОМПАНИИ
+Route::delete('/company/values/{field}', [\App\Http\Controllers\Api\Company\ValuesController::class, 'destroy'])->name('company.values.destroy');
+//-----------
+//-----------
 
 //TODO ПРАВИЛА ДЛЯ СДЕЛКИ
 //ВЫВОД ПРАВИЛ ДЛЯ СДЕЛКИ
@@ -140,6 +182,14 @@ Route::get('/deal/rules/{id}', [\App\Http\Controllers\Api\Deal\RulesController::
 Route::delete('/deal/rules/{id}', [\App\Http\Controllers\Api\Deal\RulesController::class, 'destroy'])->name('deal.rules.destroy');
 //ПРОВЕРКА ПРАВИЛ ДЛЯ СДЕЛКИ
 Route::post('/deal/check_rules', [\App\Http\Controllers\Api\Deal\RulesController::class, 'check_rules'])->name('deal.rules.check_rules');
+//ПРАВИЛ БЛОКА ДЛЯ КОНТАКТА ПО ID
+Route::get('/deal/rulesblock/{id}', [\App\Http\Controllers\Api\Deal\RulesController::class, 'indexblock'])->name('deal.rules.indexblock');
+//ОБНОВЛЕНИЕ ПРАВИЛ БЛОКА ДЛЯ КОНТАКТА
+Route::patch('/deal/rulesblock/{id}', [\App\Http\Controllers\Api\Deal\RulesController::class, 'updateblock'])->name('deal.rules.updateblock');
+//УДАЛЕНИЕ БЛОКА ПРАВИЛ ДЛЯ КОНТАКТА
+Route::delete('/deal/rulesblock/{id}', [\App\Http\Controllers\Api\Deal\RulesController::class, 'destroyblock'])->name('deal.rules.destroyblock');
+
+
 //
 //TODO ПОЛЯ ДЛЯ СДЕЛКИ
 //ВЫВОД ПОЛЕЙ ДЛЯ СДЕЛКИ
@@ -156,6 +206,18 @@ Route::delete('/deal/fields/{field}', [\App\Http\Controllers\Api\Deal\FieldsCont
 Route::post('/deal/update_index', [\App\Http\Controllers\Api\Deal\FieldsController::class, 'update_index'])->name('deal.fields.update_index');
 //-----------
 //----------------
+//TODO ЗНАЧЕНИЯ ДЛЯ СДЕЛКИ
+//ВЫВОД ЗНАЧЕНИЙ ДЛЯ СДЕЛКИ
+Route::get('/deal/values', [\App\Http\Controllers\Api\Deal\ValuesController::class, 'index'])->name('deal.values.index');
+//ДОБАВЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ СДЕЛКИ
+Route::post('/deal/values', [\App\Http\Controllers\Api\Deal\ValuesController::class, 'store'])->name('deal.values.store');
+//ОБНОВЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ СДЕЛКИ
+Route::patch('/deal/values/{id}', [\App\Http\Controllers\Api\Deal\ValuesController::class, 'update'])->name('deal.values.update');
+//ПОЛУЧЕНИЯ ЗНАЧЕНИЙ ДЛЯ СДЕЛКИ
+Route::get('/deal/values/{id}', [\App\Http\Controllers\Api\Deal\ValuesController::class, 'show'])->name('deal.values.show');
+//УДАЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ СДЕЛКИ
+Route::delete('/deal/values/{field}', [\App\Http\Controllers\Api\Deal\ValuesController::class, 'destroy'])->name('deal.values.destroy');
+//-----------
 
 //TODO ПРАВИЛА ДЛЯ ПРЕДЛОЖЕНИЯ
 //ВЫВОД ПРАВИЛ ДЛЯ ПРЕДЛОЖЕНИЯ
@@ -170,6 +232,13 @@ Route::get('/quote/rules/{id}', [\App\Http\Controllers\Api\Quote\RulesController
 Route::delete('/quote/rules/{id}', [\App\Http\Controllers\Api\Quote\RulesController::class, 'destroy'])->name('quote.rules.destroy');
 //ПРОВЕРКА ПРАВИЛ ДЛЯ ПРЕДЛОЖЕНИЯ
 Route::post('/quote/check_rules', [\App\Http\Controllers\Api\Quote\RulesController::class, 'check_rules'])->name('quote.rules.check_rules');
+//ПРАВИЛ БЛОКА ДЛЯ КОНТАКТА ПО ID
+Route::get('/quote/rulesblock/{id}', [\App\Http\Controllers\Api\Quote\RulesController::class, 'indexblock'])->name('quote.rules.indexblock');
+//ОБНОВЛЕНИЕ ПРАВИЛ БЛОКА ДЛЯ КОНТАКТА
+Route::patch('/quote/rulesblock/{id}', [\App\Http\Controllers\Api\Quote\RulesController::class, 'updateblock'])->name('quote.rules.updateblock');
+//УДАЛЕНИЕ БЛОКА ПРАВИЛ ДЛЯ КОНТАКТА
+Route::delete('/quote/rulesblock/{id}', [\App\Http\Controllers\Api\Quote\RulesController::class, 'destroyblock'])->name('quote.rules.destroyblock');
+
 //
 //TODO ПОЛЯ ДЛЯ ПРЕДЛОЖЕНИЯ
 //ВЫВОД ПОЛЕЙ ДЛЯ ПРЕДЛОЖЕНИЯ
@@ -185,7 +254,18 @@ Route::delete('/quote/fields/{field}', [\App\Http\Controllers\Api\Quote\FieldsCo
 //УДАЛЕНИЕ ПОЛЕЙ ДЛЯ ПРЕДЛОЖЕНИЯ
 Route::post('/quote/update_index', [\App\Http\Controllers\Api\Quote\FieldsController::class, 'update_index'])->name('quote.fields.update_index');
 //-----------
-//----------------
+//TODO ЗНАЧЕНИЯ ДЛЯ ПРЕДЛОЖЕНИЯ
+//ВЫВОД ЗНАЧЕНИЙ ДЛЯ ПРЕДЛОЖЕНИЯ
+Route::get('/quote/values', [\App\Http\Controllers\Api\Quote\ValuesController::class, 'index'])->name('quote.values.index');
+//ДОБАВЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ ПРЕДЛОЖЕНИЯ
+Route::post('/quote/values', [\App\Http\Controllers\Api\Quote\ValuesController::class, 'store'])->name('quote.values.store');
+//ОБНОВЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ ПРЕДЛОЖЕНИЯ
+Route::patch('/quote/values/{id}', [\App\Http\Controllers\Api\Quote\ValuesController::class, 'update'])->name('quote.values.update');
+//ПОЛУЧЕНИЯ ЗНАЧЕНИЙ ДЛЯ ПРЕДЛОЖЕНИЯ
+Route::get('/quote/values/{id}', [\App\Http\Controllers\Api\Quote\ValuesController::class, 'show'])->name('quote.values.show');
+//УДАЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ ПРЕДЛОЖЕНИЯ
+Route::delete('/quote/values/{field}', [\App\Http\Controllers\Api\Quote\ValuesController::class, 'destroy'])->name('quote.values.destroy');
+//-----------
 
 ////TODO ЗАВИСИМОСТИ СПИСКОВ ДЛЯ ЛИДА
 //ВЫВОД ПОЛЕЙ ДЛЯ ЛИДА
