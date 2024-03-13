@@ -113,14 +113,17 @@ class MyB24
         return $response->json();
     }
 
-    static function getCallB24(Request $request, $method, $type = 'json')
+
+    static function getCallB24(Request $request, $method, $select, $type = 'json')
     {
+//        return $params;
         $domain = $request->input('DOMAIN');
         $auth_id = $request->input('AUTH_ID');
         //  $method = 'crm.company.list';
         $url = 'https://' . $domain . '/rest/' . $method . '.json';
         $response = Http::post($url, [
             'auth' => $auth_id,
+            'select' => $select
         ]);
 
         if ($type == 'array') {
@@ -255,7 +258,7 @@ class MyB24
             'auth' => $auth_id,
             "id" => $id,
             'fields' => [
-                'TITLE' => "New Test - " . $id,
+                'TITLE' => "New Test ---*** - " . $id,
                 "NAME" => "NAME"
             ]
         ]);
@@ -351,7 +354,7 @@ class MyB24
             [
                 'auth' => $auth_id,
                 'EVENT' => $event,
-                'HANDLER' => "https://bitb24.ru/handler",
+                'HANDLER' => "https://bitb24.ru/laravel/handler/",
                 'EVENT_TYPE' => 'online'
             ]);
 
@@ -1130,6 +1133,170 @@ class MyB24
             'auth' => $data->access_token,
             "id" => '2',
         ]);
+
+        return $response->json();
+    }
+
+    //TODO PHONEPHONEPHONEPHONEPHONEPHONE
+    //PHONE
+    //PHONE
+    static function getPhoneCallB24($crm_type)
+    {
+        $res = MyB24::CallB24_refresh_token('e06846e3d3560fffef5142c3fff0a8f6');
+
+        if (!$res) {
+            return false;
+        }
+        $data = Setting::where('member_id', 'e06846e3d3560fffef5142c3fff0a8f6')->first();
+
+        if (!$data) {
+            return false;
+        }
+
+        $method = '';
+
+        switch ($crm_type) {
+            case "CRM_LEAD":
+                $method = "crm.contact.list";
+                break;
+            case "CRM_COMPANY":
+                $method = "crm.company.list";
+                break;
+            case "CRM_CONTACT":
+                $method = "crm.contact.list";
+                break;
+        }
+
+        if (!$method) {
+            return false;
+        }
+
+        $url = 'https://' . $data->domain . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $data->access_token,
+            "select" => ["ID", "PHONE"],
+        ]);
+
+        return $response->json();
+    }
+
+
+    //TODO PHONEPHONEPHONEPHONE
+    //PHONE UPDATE
+    static function setPhoneCallB24($crm_type, $id, $phone)
+    {
+//        return $phone;
+        $res = MyB24::CallB24_refresh_token('e06846e3d3560fffef5142c3fff0a8f6');
+
+        if (!$res) {
+
+            return false;
+        }
+        $data = Setting::where('member_id', 'e06846e3d3560fffef5142c3fff0a8f6')->first();
+
+        if (!$data) {
+            return false;
+        }
+
+        $method = '';
+
+        switch ($crm_type) {
+            case "CRM_LEAD":
+                $method = "crm.contact.update";
+                break;
+            case "CRM_COMPANY":
+                $method = "crm.company.update";
+                break;
+            case "CRM_CONTACT":
+                $method = "crm.contact.update";
+                break;
+        }
+
+        if (!$method) {
+            dump(1);
+            return false;
+        }
+
+        $url = 'https://' . $data->domain . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $data->access_token,
+            'id' => $id,
+            'fields' => [
+                "PHONE" => [$phone]
+            ]
+        ]);
+        return $response->json();
+    }
+
+    //PHONE
+    static function getBatchPhoneCallB24($crm_type)
+    {
+        $res = MyB24::CallB24_refresh_token('e06846e3d3560fffef5142c3fff0a8f6');
+
+        if (!$res) {
+            return false;
+        }
+        $data = Setting::where('member_id', 'e06846e3d3560fffef5142c3fff0a8f6')->first();
+
+        if (!$data) {
+            return false;
+        }
+
+        $method = '';
+
+        switch ($crm_type) {
+            case "CRM_LEAD":
+                $method = "crm.contact.list";
+                break;
+            case "CRM_COMPANY":
+                $method = "crm.company.list";
+                break;
+            case "CRM_CONTACT":
+                $method = "crm.contact.list";
+                break;
+        }
+
+        if (!$method) {
+            return false;
+        }
+
+        $url = 'https://' . $data->domain . '/rest/' . $method . '.json';
+        $url_batch = 'https://' . $data->domain . '/rest/batch.json';
+
+        $response = Http::post($url, [
+            'auth' => $data->access_token,
+            "select" => ["ID", "PHONE"],
+        ]);
+
+        $result = $response->json();
+
+        $request_arr = [];
+        for ($i = 0; $i < $result['total']; $i += 50) {
+            $request_arr[] = 'crm.contact.list?' . http_build_query(array(
+                    "start" => $i,
+                    "select" => ["ID", "PHONE"],
+                ));
+
+        }
+
+        $response = Http::timeout(-1)->post($url_batch, [
+            'auth' => $data->access_token,
+            "halt" => 0,
+            "cmd" =>
+                $request_arr
+        ]);
+//        $response = Http::post($url_batch, [
+//            'auth' => $data->access_token,
+//            "halt" => 0,
+//            "cmd" => [
+//                'crm.contact.list?' . http_build_query(array(
+//                    "start" => 0,
+//                )),
+//                'crm.contact.list?' . http_build_query(array(
+//                    "start" => 50,
+//                )),
+//            ]
+//        ]);
 
         return $response->json();
     }

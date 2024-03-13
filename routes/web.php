@@ -23,6 +23,7 @@ Route::post('/install', [IndexController::class, 'install']);
 Route::post('/handler', [IndexController::class, 'handler'])->name('handler');
 Route::post('/leads', [IndexController::class, 'leads'])->name('leads');
 Route::post('/placement', [IndexController::class, 'placement']);
+Route::post('/test', [IndexController::class, 'test']);
 
 
 //Route::get('/', function () {

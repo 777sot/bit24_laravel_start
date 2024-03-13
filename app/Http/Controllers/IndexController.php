@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Services\FieldsBTX;
 use App\Http\Services\MyB24;
+use App\Http\Services\Phone\Parser;
 use App\Http\Services\Services;
 use App\Models\Field;
 use App\Models\Rule;
@@ -36,7 +37,7 @@ class IndexController extends Controller
         $update = [];
         $update['LIST_COLUMN_LABEL'] = 'СПИСОК NEW CRM_LEAD UPD';
         $update["EDIT_FORM_LABEL"] = $update["LIST_COLUMN_LABEL"];
-        $update["LIST"] = [["VALUE" => "Элемент #188"], ["VALUE" => "Элемент #288"],  ["VALUE" => "Элемент #4"], ["VALUE" => "Элемент #5"]] ;
+        $update["LIST"] = [["VALUE" => "Элемент #188"], ["VALUE" => "Элемент #288"], ["VALUE" => "Элемент #4"], ["VALUE" => "Элемент #5"]];
 
 
 //        $upd_field_text = MyB24::CallB24_field_enumeration_upd($request,  "CRM_LEAD", 'MY_LIST_TEST', $update);
@@ -45,7 +46,7 @@ class IndexController extends Controller
         $del_field = MyB24::CallB24_field_del($request, "CRM_LEAD", 'STRING_8');
 //        dd($del_field);
         //СПИСОК ПОЛЬЗОВАТЕЛЬСКИХ ПОЛЕЙ СПИСОК
-        $usr_field_list = MyB24::CallB24_field_list($request,  "CRM_LEAD", );
+        $usr_field_list = MyB24::CallB24_field_list($request, "CRM_LEAD",);
         dd($usr_field_list);
         //ДОБАВЛЕНИЕ ПОЛЯ СПИСОК
 
@@ -241,8 +242,78 @@ class IndexController extends Controller
         $id = Services::getLeads($request, 'id');
         $CRM_TYPE = json_decode($data['PLACEMENT_OPTIONS'])->ENTITY_ID;
 
-        $fields = Field::where('member_id','e06846e3d3560fffef5142c3fff0a8f6')->where('CRM_TYPE',$CRM_TYPE)->get();
+        $fields = Field::where('member_id', 'e06846e3d3560fffef5142c3fff0a8f6')->where('CRM_TYPE', $CRM_TYPE)->get();
 //        dd($fields);
         return view('btx.placement', compact('id', 'fields', 'domain', 'auth_id'));
     }
+
+    public function test(Request $request)
+    {
+
+
+        //PARSER
+
+//        $phone = '+7 (999) 999-99-99';
+//
+//        $str = "+123456()[]/*-789mn-bm0hfdec,hrthytr.";
+//        $result = preg_replace("/[^0-9]/", '', $phone);
+//        dd($result);
+        //PARSER
+
+//        $select = [ "ID", "PHONE" ];
+
+        $replase = '8';
+
+//        $results = MyB24::getPhoneCallB24("CRM_CONTACT");
+        $results = MyB24::getBatchPhoneCallB24("CRM_CONTACT");
+        dd($results['result']);
+        if (isset($results['result'])) {
+            if (count($results['result']) > 0) {
+                foreach ($results['result'] as $result) {
+                    $id = $result['ID'];
+                    if (isset($result['PHONE'])) {
+                        foreach ($result['PHONE'] as $phone_data)
+                            $phone = preg_replace("/[^0-9]/", '', $phone_data['VALUE'] ?? '');
+                        if (strlen($phone) === 11) {
+                            if (substr($phone, 0, 1) === '7' || substr($phone, 0, 1) === '8') {
+                                $phone = preg_replace('/^./',$replase, $phone);
+                                $phone_data['VALUE'] = $phone;
+//                                dump($phone_data);
+                                $result1 = MyB24::setPhoneCallB24("CRM_LEAD", $id, $phone_data);
+//                                dump($result1);
+//                                $results = MyB24::getPhoneCallB24("CRM_LEAD");
+//                                dd($results);
+                                //ВНОСИМ ИЗМЕНЕНИЯ
+                            } else {
+                                //ОШИБКА НОМЕРА
+                                dump('BREACK', $phone);
+                            }
+
+                        } else {
+                            //ОШИБКА НОМЕРА
+                            dump('BREACK', $phone);
+                        }
+                    }
+//                    dump($result);
+                }
+            }
+        }
+        dd($results);
+
+        $id = $result['result'][0]['ID'];
+        $phone = [[
+            'ID' => $result['result'][0]['PHONE'][0]['ID'],
+            'VALUE_TYPE' => $result['result'][0]['PHONE'][0]['VALUE_TYPE'],
+            'TYPE_ID' => $result['result'][0]['PHONE'][0]['TYPE_ID'],
+            'VALUE' => preg_replace("/[^0-9]/", '', $result['result'][0]['PHONE'][0]['VALUE']),
+        ]];
+
+
+        $result1 = MyB24::setPhoneCallB24($request, "crm.contact.update", $id, $phone);
+        dd($result1);
+
+//        dd($result['result'][0]['PHONE']);
+    }
+
+
 }

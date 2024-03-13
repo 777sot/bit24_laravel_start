@@ -293,7 +293,7 @@ Route::get('/help/rule_type', [\App\Http\Controllers\Api\Help\HelpController::cl
 
 
 
-Route::get('/qwe', [\App\Http\Controllers\Api\LeadsController::class, 'test'])->name('test.leads');
+Route::get('/abc', [\App\Http\Controllers\Api\LeadsController::class, 'test'])->name('test.leads');
 
 Route::post('/rules', [\App\Http\Controllers\Api\LeadsController::class, 'rules'])->name('rules.leads');
 //ДОБАВЛЕНИЕ ПРАВИЛА ДЛЯ ЛИДА
