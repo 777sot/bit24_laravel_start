@@ -24,9 +24,9 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'fields' => 'required|string',
-            'rule' => 'required|string',
-            'rule_type' => 'string',
+            'field_right' => 'required|string',
+            'field_left' => 'required|string',
+//            'rule_type' => 'required|string',
             'show' => 'string|boolean',
             'member_id' => 'required|string|exists:App\Models\Setting,member_id',
         ];
@@ -44,12 +44,12 @@ class UpdateRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'fields.required' => 'A fields is required',
-            'fields.string' => 'A fields is string',
-            'rule.required' => 'A rule is required',
-            'rule.string' => 'A rule is string',
-            'rule_type.required' => 'A rule_type is required',
-            'rule_type.string' => 'A rule_type must be 1 or 2 or 3',
+            'field_right.required' => 'A field_right is required',
+            'field_right.string' => 'A field_right is string',
+            'field_left.required' => 'A field_left is required',
+            'field_left.string' => 'A field_left is string',
+//            'rule_type.required' => 'A rule_type is required',
+//            'rule_type.string' => 'A rule_type must be 1 or 2 or 3',
             'show.string' => 'A show must be 0 or 1',
             'show.boolean' => 'A show must be 0 or 1',
         ];

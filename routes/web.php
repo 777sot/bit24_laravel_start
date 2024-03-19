@@ -25,6 +25,19 @@ Route::post('/leads', [IndexController::class, 'leads'])->name('leads');
 Route::post('/placement', [IndexController::class, 'placement']);
 Route::post('/test', [IndexController::class, 'test']);
 
+//PHONE
+Route::post('/phonesinstall', [\App\Http\Controllers\Phones\IndexController::class, 'install'])->name('index.phones');
+Route::post('/phones', [\App\Http\Controllers\Phones\IndexController::class, 'index'])->name('index.phones');
+Route::get('/phones', [\App\Http\Controllers\Phones\IndexController::class, 'index'])->name('index.phones');
+//ДОБАВЛЕНИЕ/ИЗМЕНЕНИЕ ПАРАМЕТРОВ
+Route::post('/phones/store', [\App\Http\Controllers\Phones\IndexController::class, 'store'])->name('store.phones');
+//ОБРАБОТКА СОБЫТИЙ
+Route::post('/phones/handler', [\App\Http\Controllers\Phones\IndexController::class, 'handler'])->name('handler.phones');
+//ОБНОВЛЕНИЕ НОМЕРОВ
+Route::post('/phonesupdate', [\App\Http\Controllers\Phones\IndexController::class, 'phonesupdate'])->name('phonesupdate.phones');
+
+//PHONE
+
 
 //Route::get('/', function () {
 //    return Inertia::render('Welcome', [

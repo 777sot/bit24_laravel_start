@@ -35,6 +35,7 @@ class RuleResource extends JsonResource
         $blocks = Rule::where('block', $this->block)->get();
 
         $fields = [];
+
         foreach ($blocks as $block) {
             $fld = Field::find($block->field_id);
             $fields[] = [
@@ -44,16 +45,11 @@ class RuleResource extends JsonResource
             ];
         }
 
-
         return [
             'block_id' => $this->block,
-//            'id' => $this->id,
             'block_type' => $this->rule_type,
             'block_title' => Services::rule_type($this->rule_type),
-
-//            'controlled_field_id' => new FieldRuleResource(Field::find($this->field_id)),
             'field_right' => $fields,
-//            'show' => $this->show,
             'field_left' => $rules,
         ];
     }

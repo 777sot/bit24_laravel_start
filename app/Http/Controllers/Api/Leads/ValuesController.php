@@ -177,17 +177,18 @@ class ValuesController extends Controller
                 ->where("field_id", $field->id)
                 ->first();
 
+
             if (array_key_exists($field->id, $check_res)) {
                 $response_data[] = [
                     'field_id' => $field->id,
                     'show' => $check_res[$field->id]['show'],
-                    'VALUE' => ($val->VALUE) ? $val->VALUE : "",
+                    'VALUE' => ($val) ? $val->VALUE : "",
                 ];
             }else{
                 $response_data[] = [
                     'field_id' => $field->id,
                     'show' => 1,
-                    'VALUE' =>  ($val->VALUE) ? $val->VALUE : "",
+                    'VALUE' =>  ($val) ? $val->VALUE : "",
                 ];
             }
         }

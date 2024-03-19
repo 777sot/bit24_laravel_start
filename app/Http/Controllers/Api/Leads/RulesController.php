@@ -39,6 +39,7 @@ class RulesController extends Controller
         return [
             'data' => [...$rules_arr],
         ];
+
     }
     /**
      * Store a newly created resource in storage.

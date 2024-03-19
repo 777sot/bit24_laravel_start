@@ -17,6 +17,16 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
+<nav class="navbar">
+    <div class="container">
+        <a class="active" href="/">Единый формат для телефонных номеров</a>
+        <a class="" href="/licenses">Лицензии</a>
+        <a href="https://auth2.bitrix24.net/oauth/select/?preset=im&amp;IM_DIALOG=networkLines7575d3350d49d47db7bea9beac4b7994" target="_blank">Помощь</a>
+        <a class="" href="/offer">Предложение по доработкам</a>
+        <a class="" href="/instructions">Instructions</a>
+        <a class="" href="/about-us">О нас</a>
+    </div>
+</nav>
 <div id="app">
 
     <main class="py-4">

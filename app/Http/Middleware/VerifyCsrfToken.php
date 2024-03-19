@@ -18,5 +18,11 @@ class VerifyCsrfToken extends Middleware
         '/laravel/placement/',
         '/laravel/leads/',
         '/laravel/test/',
+
+        '/laravel/phones/',
+        '/laravel/phones/store/',
+        '/laravel/phones/handler/',
+        '/laravel/phonesinstall/',
+        '/laravel/phonesupdate/',
     ];
 }

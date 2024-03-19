@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Services\FieldsBTX;
 use App\Http\Services\MyB24;
 use App\Http\Services\Phone\Parser;
+use App\Http\Services\PhoneServices;
 use App\Http\Services\Services;
 use App\Models\Field;
 use App\Models\Rule;
@@ -201,7 +202,15 @@ class IndexController extends Controller
         $event = $request->input('event');
 
         if (in_array($event, ['0' => 'ONCRMLEADADD', '1' => 'ONCRMLEADUPDATE'])) {
+
+        }elseif (in_array($event, ['0' => 'ONCRMLEADADD', '1' => 'ONCRMLEADUPDATE'])){
+
+
+        }elseif (in_array($event, ['0' => 'ONCRMLEADADD', '1' => 'ONCRMLEADUPDATE'])){
+
         }
+
+
 
         $result = MyB24::setLeadsCallB24_test($request, 'crm.lead.update');
         Log::info($result);
@@ -262,11 +271,89 @@ class IndexController extends Controller
 
 //        $select = [ "ID", "PHONE" ];
 
-        $replase = '8';
+        $format = '7';
 
 //        $results = MyB24::getPhoneCallB24("CRM_CONTACT");
         $results = MyB24::getBatchPhoneCallB24("CRM_CONTACT");
-        dd($results['result']);
+//        dump(PhoneServices::check_results($results));
+//        dump($results);
+
+        if (PhoneServices::check_results($results)) {
+            $data = [];
+            $data_request = [];
+
+            $result = $results['result']['result'];
+
+            $data['result'] = [];
+            $data['errors'] = [];
+            $data['update'] = [];
+            $result_up['result'] = [];
+            $result_up['errors'] = [];
+            $result_up['update'] = [];
+
+            foreach ($result as $item50) {
+                $result_up = PhoneServices::update_item50($item50, "CRM_CONTACT", $format);
+                $data['result'] = [...$data['result'], ...$result_up['result']];
+                $data['errors'] = [...$data['errors'], ...$result_up['errors']];
+                $data['update'] = [...$data['update'], ...$result_up['update']];
+            }
+
+
+            foreach ($data['result'] as $item) {
+                $data_request[] = PhoneServices::get_request_crm($item, 'CRM_CONTACT');
+            }
+            $requests = array();
+            $counter = 0;
+            for ($i = 0; $i < count($data_request); $i++) {
+                $requests[$counter][] = $data_request[$i];
+                if ($i === 49) {
+                    $counter++;
+                } elseif ($i - ($counter * 50) === 49) {
+                    $counter++;
+                }
+            }
+            foreach ($requests as $req50) {
+                $response = MyB24::setBatchPhoneCallB24($req50);
+//                    dump($response);
+            }
+            dump($data['update']);
+            dd($data['errors']);
+
+            foreach ($results['result'] as $result) {
+                dd($result);
+                $data['result'] = [];
+                $data['errors'] = [];
+                $data['update'] = [];
+                foreach ($result as $item50) {
+                    $result_up = PhoneServices::update_item50($item50, "CRM_CONTACT", $format);
+                    $data['result'] = [...$data['result'], ...$result_up['result']];
+                    $data['errors'] = [...$data['errors'], ...$result_up['errors']];
+                    $data['update'] = [...$data['update'], ...$result_up['update']];
+                }
+
+                foreach ($data['result'] as $item) {
+                    $data_request[] = PhoneServices::get_request_crm($item, 'CRM_CONTACT');
+                }
+                $requests = array();
+                $counter = 0;
+                for ($i = 0; $i < count($data_request); $i++) {
+                    $requests[$counter][] = $data_request[$i];
+                    if ($i === 49) {
+                        $counter++;
+                    } elseif ($i - ($counter * 50) === 49) {
+                        $counter++;
+                    }
+                }
+                foreach ($requests as $req50) {
+                    $response = MyB24::setBatchPhoneCallB24($req50);
+//                    dump($response);
+                }
+                dump($data['update']);
+                dd($data['errors']);
+            }
+        }
+
+
         if (isset($results['result'])) {
             if (count($results['result']) > 0) {
                 foreach ($results['result'] as $result) {
@@ -276,7 +363,7 @@ class IndexController extends Controller
                             $phone = preg_replace("/[^0-9]/", '', $phone_data['VALUE'] ?? '');
                         if (strlen($phone) === 11) {
                             if (substr($phone, 0, 1) === '7' || substr($phone, 0, 1) === '8') {
-                                $phone = preg_replace('/^./',$replase, $phone);
+                                $phone = preg_replace('/^./', $format, $phone);
                                 $phone_data['VALUE'] = $phone;
 //                                dump($phone_data);
                                 $result1 = MyB24::setPhoneCallB24("CRM_LEAD", $id, $phone_data);
@@ -314,6 +401,18 @@ class IndexController extends Controller
 
 //        dd($result['result'][0]['PHONE']);
     }
+
+    public function index_phones()
+    {
+        return view('btx.index_phone');
+    }
+
+    public function store_phones(Request $request)
+    {
+        return $request->input();
+
+    }
+
 
 
 }
