@@ -178,7 +178,7 @@ class IndexController extends Controller
 //        $crm_array = array('CRM_CONTACT');
         $all_data = [];
         foreach ($crm_array as $crm_type) {
-            sleep(1);
+            sleep(2);
 //ЗАПРОСЫ НА ПОЛУЧЕНИЯ НОМЕРОВ
             $results = PhoneServices::getBatchPhoneCallB24($crm_type, $member_id);
 
@@ -224,9 +224,9 @@ class IndexController extends Controller
 
                 for ($i = 0; $i < count($data_request); $i++) {
                     $requests[$counter][] = $data_request[$i];
-                    if ($i === 49) {
+                    if ($i === 19) {
                         $counter++;
-                    } elseif ($i - ($counter * 50) === 49) {
+                    } elseif ($i - ($counter * 20) === 19) {
                         $counter++;
                     }
                 }

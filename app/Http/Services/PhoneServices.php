@@ -3,7 +3,9 @@
 namespace App\Http\Services;
 
 use App\Models\Setting;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Http;
+use GuzzleHttp\Client;
 
 class PhoneServices
 {
@@ -206,7 +208,7 @@ class PhoneServices
         }
 
         $url = 'https://' . $data->domain . '/rest/' . $method . '.json';
-        $response = Http::timeout(-1)->post($url, [
+        $response = Http::timeout(1)->post($url, [
             'auth' => $data->access_token,
             'id' => $id,
             'fields' => [
@@ -249,16 +251,36 @@ class PhoneServices
         $url = "https://" . $data->domain . "/rest/" . $method . ".json";
         $url_batch = "https://" . $data->domain . "/rest/batch.json";
 
-        $response = Http::post($url, [
-            "auth" => $data->access_token,
-            "select" => ["ID", "PHONE"],
-        ]);
+//        $response = Http::post($url, [
+//            "auth" => $data->access_token,
+//            "select" => ["ID", "PHONE"],
+//        ]);
+        try {
+
+//            $client = new Client([
+//                // Base URI is used with relative requests
+//                'base_uri' => "https://" . $data->domain. "/rest/",
+//                // You can set any number of default request options.
+////                'timeout'  => 2.0,
+//            ]);
+//            $response = $client->request('POST',  $method . ".json", [
+//                "auth" => $data->access_token,
+//                "select" => ["ID", "PHONE"],
+//            ]);
+            $response = Http::baseUrl("https://" . $data->domain)->acceptJson()->post("/rest/" . $method . ".json", [
+                "auth" => $data->access_token,
+                "select" => ["ID", "PHONE"],
+            ]);
+        } catch (GuzzleException $e) {
+            dump($e->getRequest());
+            dd($e->getResponse());
+        }
         sleep(1);
 
         $result = $response->json();
         if (isset($result['total'])) {
             $req_counter++;
-        }else{
+        } else {
             return [
                 'data' => [],
                 'error' => $result,
@@ -274,20 +296,30 @@ class PhoneServices
                     "select" => ["ID", "PHONE"],
                 ));
         }
-
-        $response = Http::post($url_batch, [
-            "auth" => $data->access_token,
-            "halt" => 0,
-            "cmd" =>
-                $request_arr
-        ]);
-
+        try {
+            $response = Http::baseUrl("https://" . $data->domain)->acceptJson()->post("/rest/batch.json", [
+                "auth" => $data->access_token,
+                "halt" => 0,
+                "cmd" =>
+                    $request_arr
+            ]);
+        } catch (GuzzleException $e) {
+            dump('error');
+            dump(Psr7\Message::toString($e->getRequest()));
+            dump(Psr7\Message::toString($e->getResponse()));
+        }
+//        $response = Http::post($url_batch, [
+//            "auth" => $data->access_token,
+//            "halt" => 0,
+//            "cmd" =>
+//                $request_arr
+//        ]);
 
 
         return [
             'data' => $response->json(),
             'req_counter' => $req_counter
-            ];
+        ];
 //        return $response->json();
     }
 
@@ -300,18 +332,29 @@ class PhoneServices
             return false;
         }
 
-        sleep(1);
+        sleep(2);
         $url_batch = "https://" . $data->domain . "/rest/batch.json";
-        $response = Http::post($url_batch, [
-            "auth" => $data->access_token,
-            "halt" => 0,
-            "cmd" =>
-                $item
-        ]);
+//        $response = Http::post($url_batch, [
+//            "auth" => $data->access_token,
+//            "halt" => 0,
+//            "cmd" =>
+//                $item
+//        ]);
+        try {
+            $response = Http::baseUrl("https://" . $data->domain)->acceptJson()->post("/rest/batch.json", [
+                "auth" => $data->access_token,
+                "halt" => 0,
+                "cmd" =>
+                    $item
+            ]);
+        } catch (GuzzleException $e) {
+            dump('error');
+            dump(Psr7\Message::toString($e->getRequest()));
+            dump(Psr7\Message::toString($e->getResponse()));
+        }
 
         return $response->json();
     }
-
 
 
 }
