@@ -110,7 +110,7 @@ class IndexController extends Controller
         if (!empty($automatic) && $crm_type) {
             $get = PhoneServices::getPhoneCallB24($crm_type, $id);
             $phones = $get['result']['PHONE'];
-            if(isset($get['result']['PHONE'])){
+            if (isset($get['result']['PHONE'])) {
                 $new_phones = [];
                 foreach ($phones as $phone) {
                     $result = PhoneServices::check_phone_format($phone['VALUE'], (string)$format);
@@ -128,9 +128,18 @@ class IndexController extends Controller
     public function phonesupdate(Request $request)
     {
 
+        $crm_title = [
+            'url' => ['CRM_LEAD' => 'lead',
+                'CRM_CONTACT' => 'contact',
+                'CRM_COMPANY' => 'company'],
+            'title' => ['CRM_LEAD' => 'Лидах',
+                'CRM_CONTACT' => 'Контактах',
+                'CRM_COMPANY' => 'Компаниях']
+        ];
+
         $req_counter = 0;
         $member_id = $request->input('member_id');
-                if (!$member_id) {
+        if (!$member_id) {
             dd('FALSE1');
             return false;
         }
@@ -161,16 +170,24 @@ class IndexController extends Controller
         $format = $phone_settings->format;
         $automatic = $phone_settings->automatic;
 
-        $crm_array = array('CRM_LEAD', 'CRM_COMPANY','CRM_CONTACT');
+        $phone_settings->automatic = '';
+        $phone_settings->save();
+
+
+        $crm_array = array('CRM_COMPANY', 'CRM_LEAD', 'CRM_CONTACT');
 //        $crm_array = array('CRM_CONTACT');
         $all_data = [];
         foreach ($crm_array as $crm_type) {
+            sleep(1);
 //ЗАПРОСЫ НА ПОЛУЧЕНИЯ НОМЕРОВ
-                $results = PhoneServices::getBatchPhoneCallB24($crm_type, $member_id);
+            $results = PhoneServices::getBatchPhoneCallB24($crm_type, $member_id);
 
 //                dd($results);
             $req_counter += $results['req_counter'];
-            if(empty($results['data'])) continue;
+            if (empty($results['data'])) {
+                dump($results);
+                continue;
+            };
 //                dd($req_counter);
             if (PhoneServices::check_results($results['data'])) {
                 $data = [];
@@ -207,9 +224,9 @@ class IndexController extends Controller
 
                 for ($i = 0; $i < count($data_request); $i++) {
                     $requests[$counter][] = $data_request[$i];
-                    if ($i === 19) {
+                    if ($i === 49) {
                         $counter++;
-                    } elseif ($i - ($counter * 20) === 19) {
+                    } elseif ($i - ($counter * 50) === 49) {
                         $counter++;
                     }
                 }
@@ -227,6 +244,9 @@ class IndexController extends Controller
 //        dd($all_data);
 
 //        dd($member_id);
-        return view('btx.index_phone', compact('member_id', 'automatic', 'format', 'errors', 'all_data', 'site'));
+        $phone_settings_fresh = Phone::where('member_id', $member_id)->first();
+        $phone_settings_fresh->automatic = $automatic;
+        $phone_settings_fresh->save();
+        return view('btx.index_phone', compact('member_id', 'crm_title', 'automatic', 'format', 'errors', 'all_data', 'site'));
     }
 }

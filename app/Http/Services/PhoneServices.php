@@ -65,9 +65,9 @@ class PhoneServices
             return false;
         }
 
-        $request = $method . '?' . http_build_query(array(
+        $request = $method . "?" . http_build_query(array(
                 "id" => $item['ID'],
-                'fields' => [
+                "fields" => [
                     "PHONE" => $item['PHONE']
                 ]
             ));
@@ -159,10 +159,10 @@ class PhoneServices
             return false;
         }
 
-        $url = 'https://' . $data->domain . '/rest/' . $method . '.json';
+        $url = "https://" . $data->domain . "/rest/" . $method . ".json";
         $response = Http::post($url, [
-            'auth' => $data->access_token,
-            'id' => $id,
+            "auth" => $data->access_token,
+            "id" => $id,
 //            "select" => ["ID", "PHONE"],
         ]);
 
@@ -246,11 +246,11 @@ class PhoneServices
             return false;
         }
 
-        $url = 'https://' . $data->domain . '/rest/' . $method . '.json';
-        $url_batch = 'https://' . $data->domain . '/rest/batch.json';
+        $url = "https://" . $data->domain . "/rest/" . $method . ".json";
+        $url_batch = "https://" . $data->domain . "/rest/batch.json";
 
         $response = Http::post($url, [
-            'auth' => $data->access_token,
+            "auth" => $data->access_token,
             "select" => ["ID", "PHONE"],
         ]);
         sleep(1);
@@ -267,16 +267,16 @@ class PhoneServices
         }
 
         $request_arr = [];
-        for ($i = 0; $i < $result['total']; $i += 50) {
+        for ($i = 0; $i < $result['total']; $i += 49) {
             $req_counter++;
-            $request_arr[] = $method . '?' . http_build_query(array(
+            $request_arr[] = $method . "?" . http_build_query(array(
                     "start" => $i,
                     "select" => ["ID", "PHONE"],
                 ));
         }
 
         $response = Http::post($url_batch, [
-            'auth' => $data->access_token,
+            "auth" => $data->access_token,
             "halt" => 0,
             "cmd" =>
                 $request_arr
@@ -301,9 +301,9 @@ class PhoneServices
         }
 
         sleep(1);
-        $url_batch = 'https://' . $data->domain . '/rest/batch.json';
+        $url_batch = "https://" . $data->domain . "/rest/batch.json";
         $response = Http::post($url_batch, [
-            'auth' => $data->access_token,
+            "auth" => $data->access_token,
             "halt" => 0,
             "cmd" =>
                 $item

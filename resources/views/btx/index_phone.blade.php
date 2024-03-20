@@ -67,10 +67,11 @@
     </form>
 
     @if($all_data)
+        <div class="result">
         @foreach($all_data as $k => $data)
-            <div class="result">
+
                 <div class="result__section">
-                    <div class="result__section__title">Результат изменений в {{$k}}: {{ count($data['result']) }}</div>
+                    <div class="result__section__title">Результат изменений в {{$crm_title['title'][$k]}}: {{ count($data['result']) }}</div>
                     <div class="result__section__content">
                         <div class="result__content__item result__content__item_format">
                             <div class="result__content__title">Отформатировано
@@ -118,7 +119,7 @@
                                                 <path d="M6 6L18 18" stroke="#F55B5B" stroke-width="2"
                                                       stroke-linecap="round" stroke-linejoin="round"/>
                                             </svg>
-                                            <a href="https://{{$site}}/crm/contact/details/{{$errors['ID']}}/"
+                                            <a href="https://{{$site}}/crm/{{$crm_title['url'][$k]}}/details/{{$errors['ID']}}/"
                                                target="_blank" class="edit__phone__link">Редактировать вручную</a>
                                         </div>
                                     @endforeach
@@ -129,10 +130,10 @@
                     </div>
                 </div>
 
-            </div>
+
 
         @endforeach
-
+        </div>
     @endif
 <script>
 let btn_general = document.querySelector('.btn_general');
@@ -141,6 +142,7 @@ btn_general.addEventListener("click", function (e) {
     btn_general.textContent = 'Ожидайте...';
     btn_setting.style.display = "none";
     document.querySelector(".form-phone").style.opacity = "0.5";
+    document.querySelector(".result").style.display = "none";
 });
 </script>
 
