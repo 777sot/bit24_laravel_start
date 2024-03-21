@@ -18,7 +18,7 @@
                 <div class="form__section__title">Формат номеров</div>
                 <div class="form__section__inputs">
                     <label>
-                        <input type="radio" name="format" id="" value="+7"
+                        <input class="my_frm" type="radio" name="format" id="" value="+7"
                                @if($format === '+7' || $format == '')
                                    checked
                             @endif
@@ -26,7 +26,7 @@
                         +7 <span>123 456 78 91</span>
                     </label>
                     <label>
-                        <input type="radio" name="format" id="" value="7"
+                        <input class="my_frm" type="radio" name="format" id="" value="7"
                                @if($format === '7')
                                    checked
                             @endif
@@ -34,7 +34,7 @@
                         7 <span>123 456 78 91<span>
                     </label>
                     <label>
-                        <input type="radio" name="format" id="" value="8"
+                        <input class="my_frm" type="radio" name="format" id="" value="8"
                                @if($format=='8')
                                    checked
                             @endif
@@ -47,7 +47,7 @@
                 <div class="form__section__title">Автоматическое изменение номера при создании</div>
                 <div class="form__section__inputs settings-inputs">
                     <label class="checkbox-ios settings-inputs__checked">
-                        <input name="automatic" type="checkbox"
+                        <input class="my_frm" name="automatic" type="checkbox"
                                @if($automatic=='on')
                                    checked
                             @endif
@@ -57,15 +57,37 @@
                         Сразу при создании
                     </label>
                 </div>
-                <button class="bg-blue btn_setting" type="submit">Сохранить</button>
+                @if($automatic || $format)
+                    <button class="bg-blue btn_setting" type="submit" style="display: none">Сохранить</button>
+                @else
+                    <button class="bg-blue btn_setting" type="submit">Сохранить</button>
+                @endif
+
+
             </div>
         </div>
     </form>
     <form action="{{route('phonesupdate.phones')}}" method="POST">
         <input type="hidden" id="member_id" name="member_id" value="{{$member_id}}"/>
-        <button type="submit" class="bg-blue btn_general">Выполнить изменение формата номеров сейчас</button>
-    </form>
+        @if($automatic || $format)
+            <button type="submit" class="bg-blue btn_general">Выполнить изменение формата номеров сейчас</button>
+        @else
+            <button type="submit" class="bg-blue btn_general" style="display: none">Выполнить изменение формата номеров сейчас</button>
+        @endif
 
+
+    </form>
+    <div class='preloader-container' style="display: none">
+        <div class='preloader'>
+            <div class='preloader-dots'>
+                <div class='dot'></div>
+                <div class='dot'></div>
+                <div class='dot'></div>
+                <div class='dot'></div>
+                <div class='dot'></div>
+            </div>
+        </div>
+    </div>
     @if($all_data)
         <div class="result">
         @foreach($all_data as $k => $data)
@@ -138,12 +160,23 @@
 <script>
 let btn_general = document.querySelector('.btn_general');
 let btn_setting = document.querySelector('.btn_setting');
+let preloader = document.querySelector('.preloader-container');
 btn_general.addEventListener("click", function (e) {
     btn_general.textContent = 'Ожидайте...';
     btn_setting.style.display = "none";
+    preloader.style.display = "flex";
     document.querySelector(".form-phone").style.opacity = "0.5";
     document.querySelector(".result").style.display = "none";
+
 });
+var my_frm = document.querySelectorAll(".my_frm");
+my_frm.forEach(el => {
+    el.addEventListener("change", function (e) {
+        console.log('change', el.value);
+        btn_setting.style.display = "block";
+        btn_general.style.display = "none";
+    });
+})
 </script>
 
 @endsection

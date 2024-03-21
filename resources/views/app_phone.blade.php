@@ -348,6 +348,71 @@
             position: relative;
             top: -4px;
         }
+        .preloader-container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preloader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .preloader-dots {
+            height: 50px;
+            width: 80px;
+        }
+
+        .preloader-dots .dot {
+            display: inline-block;
+            background: #666;
+            height: 8px;
+            width: 8px;
+            opacity: 0.3;
+            border-radius: 50%;
+            animation: moveit 1.8s infinite;
+            background: #1fb7e7;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .dot:nth-child(4) {
+            animation-delay: 0.45s;
+        }
+
+        .dot:nth-child(5) {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes moveit {
+            0% {
+                transform: translateY(0px);
+            }
+            35% {
+                transform: translateY(0px);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translateY(-20px);
+                opacity: 0.8;
+            }
+            70% {
+                transform: translateY(3px);
+                opacity: 0.8;
+            }
+            85% {
+                transform: translateY(-3px);
+            }
+        }
     </style>
     <script>
         //ползунок
