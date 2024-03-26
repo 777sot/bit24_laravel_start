@@ -46,7 +46,7 @@ class StoreRequest extends FormRequest
         return [
             'format.required' => 'A format is required',
             'format.string' => 'A format is string',
-            'automatic.string' => 'A automatic is required',
+            'automatic.string' => 'A automatic is string',
             'member_id.string' => 'A member_id must be string',
             'member_id.required' => 'A member_id is required',
         ];

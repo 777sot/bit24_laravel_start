@@ -130,14 +130,10 @@ class PhoneServices
 
     }
 
-    public static function getPhoneCallB24($crm_type, $id)
+    public static function getPhoneCallB24($crm_type, $id, $member_id)
     {
-        $res = MyB24::CallB24_refresh_token('e06846e3d3560fffef5142c3fff0a8f6');
 
-        if (!$res) {
-            return false;
-        }
-        $data = Setting::where('member_id', 'e06846e3d3560fffef5142c3fff0a8f6')->first();
+        $data = Setting::where('member_id', $member_id)->first();
 
         if (!$data) {
             return false;
@@ -173,16 +169,10 @@ class PhoneServices
 
     //TODO PHONE UPDATE
     //PHONE UPDATE
-    static function setPhoneCallB24($crm_type, $id, $phone)
+    static function setPhoneCallB24($crm_type, $id, $phone, $member_id)
     {
-//        return $phone;
-        $res = MyB24::CallB24_refresh_token('e06846e3d3560fffef5142c3fff0a8f6');
 
-        if (!$res) {
-
-            return false;
-        }
-        $data = Setting::where('member_id', 'e06846e3d3560fffef5142c3fff0a8f6')->first();
+        $data = Setting::where('member_id', $member_id)->first();
 
         if (!$data) {
             return false;
@@ -192,7 +182,7 @@ class PhoneServices
 
         switch ($crm_type) {
             case "CRM_LEAD":
-                $method = "crm.contact.update";
+                $method = "crm.lead.update";
                 break;
             case "CRM_COMPANY":
                 $method = "crm.company.update";
@@ -354,6 +344,61 @@ class PhoneServices
         }
 
         return $response->json();
+    }
+
+    static function CallB24_refresh_token($member_id)
+    {
+        $member = Setting::where('member_id', $member_id)->first();
+
+        if (!$member) {
+            return false;
+        }
+
+        $url = 'https://oauth.bitrix.info/oauth/token/';
+        $response = Http::get($url, [
+            'grant_type' => 'refresh_token',
+            'client_id' => env('C_REST_CLIENT_ID'),
+            'client_secret' => env('C_REST_CLIENT_SECRET'),
+            'refresh_token' => $member->refresh_token,
+        ]);
+
+        $result = $response->json();
+
+        if (!isset($result['access_token'])) {
+            return false;
+        }
+
+        unset($result['expires']);
+        unset($result['scope']);
+        unset($result['server_endpoint']);
+        unset($result['status']);
+        unset($result['user_id']);
+        $result['domain'] = $member->domain;
+        $result['client_endpoint'] = $member->client_endpoint;
+        $member->update($result);
+        return true;
+    }
+
+    static function bindPhoneCallB24($method, $event, $member_id)
+    {
+
+        $data = Setting::where('member_id', $member_id)->first();
+
+        if (!$data) {
+            return false;
+        }
+
+        $damain_handler = env('APP_URL');
+
+        $url = 'https://' . $data->domain . '/rest/' . $method . '.json';
+        $response = Http::post($url, [
+            'auth' => $data->access_token,
+            'EVENT' => $event,
+            'HANDLER' => $damain_handler . "phones/handler",
+            'EVENT_TYPE' => 'online'
+        ]);
+
+        return $response;
     }
 
 

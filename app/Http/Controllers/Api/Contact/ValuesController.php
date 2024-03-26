@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Contact;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\Contacts\FieldResource;
 use App\Http\Services\MyB24;
 use App\Http\Services\Services;
 use App\Models\Field;
@@ -130,7 +131,7 @@ class ValuesController extends Controller
         $update['member_id'] = $member_id;
         $update['values_data'] = $values_data;
         $res = MyB24::CallB24_upd_values('CRM_CONTACT', $update);
-        return $response_data;
+        return ['data' => $response_data];
     }
 
     /**
@@ -178,20 +179,21 @@ class ValuesController extends Controller
 
             if (array_key_exists($field->id, $check_res)) {
                 $response_data[] = [
-                    'field_id' => $field->id,
+                    'field_id' => new FieldResource($field),
                     'show' => $check_res[$field->id]['show'],
-                    'VALUE' => ($val->VALUE) ? $val->VALUE : "",
+                    'VALUE' => (isset($val->VALUE)) ? $val->VALUE : "",
                 ];
+
             }else{
                 $response_data[] = [
-                    'field_id' => $field->id,
+                    'field_id' => new FieldResource($field),
                     'show' => 1,
-                    'VALUE' =>  ($val->VALUE) ? $val->VALUE : "",
+                    'VALUE' =>  (isset($val->VALUE)) ? $val->VALUE : "",
                 ];
             }
         }
 
-        return $response_data;
+        return ['data' => $response_data];
     }
 
     /**

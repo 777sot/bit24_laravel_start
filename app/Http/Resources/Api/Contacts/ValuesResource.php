@@ -5,7 +5,7 @@ namespace App\Http\Resources\Api\Contacts;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class FieldResource extends JsonResource
+class ValuesResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,6 +14,7 @@ class FieldResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+         return $request->input();
         return [
             'status' => true,
             'id' => $this->id,
@@ -26,6 +27,8 @@ class FieldResource extends JsonResource
             'member_id' => $this->member_id,
             'BTX_ID' => $this->BTX_ID,
             "LIST" => ($this->USER_TYPE_ID === "enumeration") ? ListResource::collection($this->lists) : 0,
+            "show" => $this->show,
+            "VALUE" => $$this->VALUE,
         ];
     }
 }

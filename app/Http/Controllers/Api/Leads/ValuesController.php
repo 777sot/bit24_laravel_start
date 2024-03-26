@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Leads;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\Leads\FieldResource;
 use App\Http\Resources\Api\Leads\ValueResource;
 use App\Http\Services\MyB24;
 use App\Http\Services\Services;
@@ -180,15 +181,15 @@ class ValuesController extends Controller
 
             if (array_key_exists($field->id, $check_res)) {
                 $response_data[] = [
-                    'field_id' => $field->id,
+                    'field_id' => new FieldResource($field),
                     'show' => $check_res[$field->id]['show'],
-                    'VALUE' => ($val) ? $val->VALUE : "",
+                    'VALUE' => (isset($val->VALUE)) ? $val->VALUE : "",
                 ];
             }else{
                 $response_data[] = [
-                    'field_id' => $field->id,
+                    'field_id' => new FieldResource($field),
                     'show' => 1,
-                    'VALUE' =>  ($val) ? $val->VALUE : "",
+                    'VALUE' =>  (isset($val->VALUE)) ? $val->VALUE : "",
                 ];
             }
         }

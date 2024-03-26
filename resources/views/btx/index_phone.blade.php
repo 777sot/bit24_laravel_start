@@ -1,14 +1,11 @@
 @extends('app_phone')
-
 @section('content')
-
     <div class="title_h1">Единый формат для телефонных номеров</div>
     @if ($errors)
         <div class="alert alert-danger">
             <h3 class="bg-blue">Повторите попытку</h3>
         </div>
     @endif
-
     <form class="form-phone" action="{{route('store.phones')}}" method="POST">
         <input type="hidden" id="member_id" name="member_id" value="{{$member_id}}"/>
         @method('post')
@@ -91,7 +88,6 @@
     @if($all_data)
         <div class="result">
         @foreach($all_data as $k => $data)
-
                 <div class="result__section">
                     <div class="result__section__title">Результат изменений в {{$crm_title['title'][$k]}}: {{ count($data['result']) }}</div>
                     <div class="result__section__content">
@@ -123,7 +119,6 @@
                                         </div>
                                     </div>
                                 @endforeach
-
                             </div>
                         </div>
                         <div class="result__content__item">
@@ -146,14 +141,10 @@
                                         </div>
                                     @endforeach
                                 @endforeach
-
                             </div>
                         </div>
                     </div>
                 </div>
-
-
-
         @endforeach
         </div>
     @endif
@@ -167,7 +158,6 @@ btn_general.addEventListener("click", function (e) {
     preloader.style.display = "flex";
     document.querySelector(".form-phone").style.opacity = "0.5";
     document.querySelector(".result").style.display = "none";
-
 });
 var my_frm = document.querySelectorAll(".my_frm");
 my_frm.forEach(el => {
@@ -178,5 +168,4 @@ my_frm.forEach(el => {
     });
 })
 </script>
-
 @endsection

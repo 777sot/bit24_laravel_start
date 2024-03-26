@@ -13,7 +13,60 @@ class MyB24
      *
      * @return array setting for getAppSettings()
      */
+    public static function installApp(Request $request)
+    {
+        $domain = $request->input('DOMAIN');
+        $auth_id = $request->input('AUTH_ID');
+        $plasement = $request->input('PLACEMENT');
+        $auth_exp = $request->input('AUTH_EXPIRES');
+        $app_sid = $request->input('APP_SID');
+        $refresh_id = $request->input('REFRESH_ID');
+        $event = $request->input('event');
+        $member_id = $request->input('member_id');
 
+        $result = [
+            'rest_only' => true,
+            'install' => false
+        ];
+
+        if ($event == 'ONAPPINSTALL' && !empty($auth_id)) {
+            $result['install'] = static::setAppSettings($auth_id, true);
+        } elseif ($plasement == 'DEFAULT') {
+            $result['rest_only'] = false;
+            $result['install'] = static::setAppSettings(
+                [
+                    'access_token' => htmlspecialchars($auth_id),
+                    'expires_in' => htmlspecialchars($auth_exp),
+                    'application_token' => htmlspecialchars($app_sid),
+                    'refresh_token' => htmlspecialchars($refresh_id),
+                    'domain' => htmlspecialchars($domain),
+                    'client_endpoint' => 'https://' . htmlspecialchars($domain) . '/rest/',
+                ],
+                true
+            );
+
+            Setting::updateOrCreate([
+                'member_id' => htmlspecialchars($member_id)
+            ], [
+                'member_id' => htmlspecialchars($member_id),
+                'access_token' => htmlspecialchars($auth_id),
+                'expires_in' => htmlspecialchars($auth_exp),
+                'application_token' => htmlspecialchars($app_sid),
+                'refresh_token' => htmlspecialchars($refresh_id),
+                'domain' => htmlspecialchars($domain),
+                'client_endpoint' => 'https://' . htmlspecialchars($domain) . '/rest/',
+            ]);
+        }
+
+//        static::setLog(
+//            [
+//                'request' => $request->all(),
+//                'result' => $result
+//            ],
+//            'installApp'
+//        );
+        return $result;
+    }
     public static function getSettingData()
     {
         $return = [];
@@ -361,22 +414,21 @@ class MyB24
         return $response;
     }
 
-    static function bindPhoneCallB24($method, $event)
+    static function bindPhoneCallB24($method, $event, $member_id)
     {
 
-        $res = MyB24::CallB24_refresh_token('e06846e3d3560fffef5142c3fff0a8f6');
+        $res = MyB24::CallB24_refresh_token($member_id);
 
         if (!$res) {
             return false;
         }
-        $data = Setting::where('member_id', 'e06846e3d3560fffef5142c3fff0a8f6')->first();
+        $data = Setting::where('member_id', $member_id)->first();
 
         if (!$data) {
             return false;
         }
 
-//        $domain = $request->input('DOMAIN');
-//        $auth_id = $request->input('AUTH_ID');
+//        $damain_handler = env('C_REST_CLIENT_ID');
 
         $url = 'https://' . $data->domain . '/rest/' . $method . '.json';
         $response = Http::post($url, [
@@ -389,60 +441,7 @@ class MyB24
         return $response;
     }
 
-    public static function installApp(Request $request)
-    {
-        $domain = $request->input('DOMAIN');
-        $auth_id = $request->input('AUTH_ID');
-        $plasement = $request->input('PLACEMENT');
-        $auth_exp = $request->input('AUTH_EXPIRES');
-        $app_sid = $request->input('APP_SID');
-        $refresh_id = $request->input('REFRESH_ID');
-        $event = $request->input('event');
-        $member_id = $request->input('member_id');
 
-        $result = [
-            'rest_only' => true,
-            'install' => false
-        ];
-
-        if ($event == 'ONAPPINSTALL' && !empty($auth_id)) {
-            $result['install'] = static::setAppSettings($auth_id, true);
-        } elseif ($plasement == 'DEFAULT') {
-            $result['rest_only'] = false;
-            $result['install'] = static::setAppSettings(
-                [
-                    'access_token' => htmlspecialchars($auth_id),
-                    'expires_in' => htmlspecialchars($auth_exp),
-                    'application_token' => htmlspecialchars($app_sid),
-                    'refresh_token' => htmlspecialchars($refresh_id),
-                    'domain' => htmlspecialchars($domain),
-                    'client_endpoint' => 'https://' . htmlspecialchars($domain) . '/rest/',
-                ],
-                true
-            );
-
-            Setting::updateOrCreate([
-                'member_id' => htmlspecialchars($member_id)
-            ], [
-                'member_id' => htmlspecialchars($member_id),
-                'access_token' => htmlspecialchars($auth_id),
-                'expires_in' => htmlspecialchars($auth_exp),
-                'application_token' => htmlspecialchars($app_sid),
-                'refresh_token' => htmlspecialchars($refresh_id),
-                'domain' => htmlspecialchars($domain),
-                'client_endpoint' => 'https://' . htmlspecialchars($domain) . '/rest/',
-            ]);
-        }
-
-//        static::setLog(
-//            [
-//                'request' => $request->all(),
-//                'result' => $result
-//            ],
-//            'installApp'
-//        );
-        return $result;
-    }
 
     static function CallB24_field_text_add(Request $request, $crm_type, $add = [])
     {

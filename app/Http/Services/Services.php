@@ -199,10 +199,14 @@ class Services
         $result = [];
 
         if (count($rules) == 0) {
-            return 'Rules empty';
+            return [
+                'status' => false,
+                'errors' => 'Rules empty'
+            ];
         }
         unset($data['CRM_TYPE']);
         unset($data['member_id']);
+//        $result = [];
         foreach ($rules as $rule) {
             if ($rule->rule_type == 1) {
                 $result[] = Services::checkFieldsOne($data, $rule);
@@ -212,6 +216,16 @@ class Services
                 $result[] = Services::checkFieldsThree($data, $rule);
             }
         }
+//  $result = [];
+//        foreach ($rules as $rule) {
+//            if ($rule->rule_type == 1) {
+//                $result = [...$result, ...Services::checkFieldsOne($data, $rule)];
+//            } elseif ($rule->rule_type == 2) {
+//                $result =  [...$result, ...Services::checkFieldsTwo($data, $rule)];
+//            } elseif ($rule->rule_type == 3) {
+//                [...$result, ...Services::checkFieldsThree($data, $rule)];
+//            }
+//        }
         return $result;
     }
 

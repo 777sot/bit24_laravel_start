@@ -363,10 +363,15 @@ class RulesController extends Controller
 
     public function check_rules(Request $request)
     {
+
+
         $data = $request->input();
-//return $data;
+        $data['CRM_TYPE'] = 'CRM_CONTACT';
+
         foreach ($data as $field_id => $value) {
+
 if($field_id === 'CRM_TYPE' || $field_id === 'member_id') continue;
+
             $field = Field::find($field_id);
 
             if (!$field) {
@@ -377,7 +382,7 @@ if($field_id === 'CRM_TYPE' || $field_id === 'member_id') continue;
             }
         }
 
-        return Services::checkLeadsFields($request);
+        return Services::checkLeadsFields($data);
     }
 
     /**

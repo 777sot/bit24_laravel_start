@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
 class RulesController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * ВЫВОД СПИСКА ПРАВИЛ
      */
     public function index(ShowRequest $request)
     {
@@ -40,7 +40,7 @@ class RulesController extends Controller
         ];
     }
     /**
-     * Store a newly created resource in storage.
+     * ДОБАВЛЕНИЕ ПРАВИЛА
      */
     public function store(StoreRequest $request)
     {
@@ -165,7 +165,7 @@ class RulesController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * ПОКАЗАТЬ ПРАВИЛО ПО ID
      */
     public function show(ShowRequest $request, string $id)
     {
@@ -194,7 +194,7 @@ class RulesController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * ОБНОВЛЕНИЕ ПРАВИЛА
      */
     public function update(UpdateRequest $request, string $id)
     {
@@ -309,7 +309,7 @@ class RulesController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * УДАЛЕНИЕ ПРАВИЛА ПО ID
      */
     public function destroy(ShowRequest $request, string $id)
     {
@@ -344,7 +344,7 @@ class RulesController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * ПРОВЕРКА ПРАВИЛА
      */
     public function check_rules(Request $request)
     {
@@ -367,7 +367,7 @@ class RulesController extends Controller
 
 
     /**
-     * Remove the specified resource from storage.
+     * ПОЛУЧЕНИЕ БЛОКА ПО ИНДЕКС
      */
     public function indexblock(ShowRequest $request, string $id)
     {
@@ -401,7 +401,9 @@ class RulesController extends Controller
 
 
     }
-
+    /**
+     * ОБНОВЛЕНИЕ БЛОКА ПО ИНДЕКС
+     */
     public function updateblock(UpdateRequest $request, string $id)
     {
 
@@ -554,7 +556,7 @@ class RulesController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * УДАЛЕНИЕ БЛОКА ПО ИНДЕКС
      */
     public function destroyblock(ShowRequest $request, string $id)
     {
@@ -591,7 +593,6 @@ class RulesController extends Controller
                 'messages' => 'RuleBLOCK is not found',
             ]);
         }
-
 
     }
 
