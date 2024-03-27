@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
 class RulesController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * ВЫВОД ПРАВИЛ
      */
     public function index(ShowRequest $request)
     {
@@ -41,7 +41,7 @@ class RulesController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * ДОБАВЛЕНИЕ ПРАВИЛ
      */
     public function store(StoreRequest $request)
     {
@@ -183,7 +183,7 @@ class RulesController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * ПОКАЗАТЬ ПРАВИЛО ПО ID
      */
     public function show(ShowRequest $request, string $id)
     {
@@ -212,7 +212,7 @@ class RulesController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * ОБНОВЛЕНИЕ ПРАВИЛ ПО ID
      */
     public function update(UpdateRequest $request, string $id)
     {
@@ -302,7 +302,6 @@ class RulesController extends Controller
                             'messages' => "field_id must not be equal to id",
                         ]);
                     }
-
                 }
 
                 $rule_data->update([
@@ -327,7 +326,7 @@ class RulesController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * УДАЛЕНИЕ ПРАВИЛА ПО ID
      */
     public function destroy(ShowRequest $request, string $id)
     {
@@ -360,11 +359,11 @@ class RulesController extends Controller
             ]);
         }
     }
-
+    /**
+     * (УСТАРЕЛ)ПРОВЕРКА ПРАВИЛ ПО ID
+     */
     public function check_rules(Request $request)
     {
-
-
         $data = $request->input();
         $data['CRM_TYPE'] = 'CRM_CONTACT';
 
@@ -386,7 +385,7 @@ if($field_id === 'CRM_TYPE' || $field_id === 'member_id') continue;
     }
 
     /**
-     * Remove the specified resource from storage.
+     * ИЗМЕНЕНИЕ ИНДЕКСОВ
      */
     public function indexblock(ShowRequest $request, string $id)
     {
@@ -417,11 +416,11 @@ if($field_id === 'CRM_TYPE' || $field_id === 'member_id') continue;
                 'messages' => 'RuleBLOCK is not found',
             ]);
         }
-
-
     }
 
-
+    /**
+     * ОБНОВЛЕНИЕ БЛОКОВ ПРАВИЛ
+     */
     public function updateblock(UpdateRequest $request, string $id)
     {
 
@@ -593,7 +592,7 @@ if($field_id === 'CRM_TYPE' || $field_id === 'member_id') continue;
     }
 
     /**
-     * Remove the specified resource from storage.
+     * УДАЛЕНИЕ БЛОКОВ ПРАВИЛ
      */
     public function destroyblock(ShowRequest $request, string $id)
     {
@@ -630,9 +629,6 @@ if($field_id === 'CRM_TYPE' || $field_id === 'member_id') continue;
                 'messages' => 'RuleBLOCK is not found',
             ]);
         }
-
-
     }
-
 
 }

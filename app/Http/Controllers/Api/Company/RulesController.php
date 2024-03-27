@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
 class RulesController extends Controller
 {
     /**
-     * ВЫВОД СПИСКА ПРАВИЛ
+     * ВЫВОД ПРАВИЛ
      */
     public function index(ShowRequest $request)
     {
@@ -39,8 +39,9 @@ class RulesController extends Controller
             'data' => [...$rules_arr],
         ];
     }
+
     /**
-     * ДОБАВЛЕНИЕ ПРАВИЛА
+     * ДОБАВЛЕНИЕ ПРАВИЛ
      */
     public function store(StoreRequest $request)
     {
@@ -55,9 +56,11 @@ class RulesController extends Controller
 
         $data = $request->validated();
 
-        $fields = $data['fields'];
-        $rules = $data['rule'];
-        $rule_type = $data['rule_type'];
+        $fields = $data['field_right'];
+        $rules = $data['field_left'];
+
+        $rule_type = $data['block_type'];
+
         $member_id = $data['member_id'];
 
         $rules = json_decode($rules);
@@ -65,7 +68,7 @@ class RulesController extends Controller
         if ($rule_type == 1 && count($rules) > 1) {
             return array('data' => [
                 'status' => false,
-                'messages' => '(rule_type == 1), rule must be 1 element in array',
+                'messages' => '(block_type == 1), rule must be 1 element in array',
             ]);
         }
 
@@ -101,8 +104,23 @@ class RulesController extends Controller
                 ]);
             }
 
-
+            //ПРЕОБРАЗОВАНИЕ ЗАПРОСА
+//            [ {"field_id": {"id": "2"}, "rule":{"rule_id":"3"}, "text": "abc"}]
+//            В
+//            [ { "id": "2", "rule": "3", "text": "abc" }]
+            $upd_rules = [];
             foreach ($rules as $rule) {
+                $field_rule_id = $rule->field_id->id;
+                $rule_rule_id = $rule->rule->rule_id;
+                $text = $rule->text;
+                $upd_rules[] = (object)[
+                    'id' => $field_rule_id,
+                    'rule' => $rule_rule_id,
+                    'text' => $text,
+                ];
+            }
+//END
+            foreach ($upd_rules as $rule) {
 
                 $field_val = Field::find($rule->id);
 
@@ -148,13 +166,13 @@ class RulesController extends Controller
 
             $results[] = Rule::firstOrCreate([
                 'field_id' => $field->field_id,
-                'rule' => json_encode($rules),
+                'rule' => json_encode($upd_rules),
                 'rule_type' => $rule_type,
                 'member_id' => $member_id,
             ], [
                 'field_id' => $field->field_id,
                 'CRM_TYPE' => "CRM_COMPANY",
-                'rule' => json_encode($rules),
+                'rule' => json_encode($upd_rules),
                 'rule_type' => $rule_type,
                 'show' => $data['show'] ?? 0,
                 'member_id' => $member_id,
@@ -194,7 +212,7 @@ class RulesController extends Controller
     }
 
     /**
-     * ОБНОВЛЕНИЕ ПРАВИЛА
+     * ОБНОВЛЕНИЕ ПРАВИЛ ПО ID
      */
     public function update(UpdateRequest $request, string $id)
     {
@@ -231,7 +249,7 @@ class RulesController extends Controller
 
             foreach ($fields as $field) {
 
-                if(isset($field->show)){
+                if (isset($field->show)) {
                     $data['show'] = $field->show;
                 }
 
@@ -284,7 +302,6 @@ class RulesController extends Controller
                             'messages' => "field_id must not be equal to id",
                         ]);
                     }
-
                 }
 
                 $rule_data->update([
@@ -342,15 +359,17 @@ class RulesController extends Controller
             ]);
         }
     }
-
     /**
-     * ПРОВЕРКА ПРАВИЛА
+     * (УСТАРЕЛ)ПРОВЕРКА ПРАВИЛ ПО ID
      */
     public function check_rules(Request $request)
     {
         $data = $request->input();
+        $data['CRM_TYPE'] = 'CRM_COMPANY';
 
         foreach ($data as $field_id => $value) {
+
+            if($field_id === 'CRM_TYPE' || $field_id === 'member_id') continue;
 
             $field = Field::find($field_id);
 
@@ -362,12 +381,11 @@ class RulesController extends Controller
             }
         }
 
-        return Services::checkLeadsFields($request);
+        return Services::checkLeadsFields($data);
     }
 
-
     /**
-     * ПОЛУЧЕНИЕ БЛОКА ПО ИНДЕКС
+     * ИЗМЕНЕНИЕ ИНДЕКСОВ
      */
     public function indexblock(ShowRequest $request, string $id)
     {
@@ -398,11 +416,10 @@ class RulesController extends Controller
                 'messages' => 'RuleBLOCK is not found',
             ]);
         }
-
-
     }
+
     /**
-     * ОБНОВЛЕНИЕ БЛОКА ПО ИНДЕКС
+     * ОБНОВЛЕНИЕ БЛОКОВ ПРАВИЛ
      */
     public function updateblock(UpdateRequest $request, string $id)
     {
@@ -423,10 +440,13 @@ class RulesController extends Controller
             ->where('block', $id)
             ->get();
 
-        $fields = $data['fields'];
+//        $fields = $data['fields'];
+        $fields = $data['field_right'];
+        $rules = $data['field_left'];
+
         $fields = json_decode($fields);
 
-        if(count($rules_block) == 0){
+        if (count($rules_block) == 0) {
             return array('data' => [
                 'status' => false,
                 'messages' => 'RuleBLOCK is not found',
@@ -446,7 +466,7 @@ class RulesController extends Controller
             }
         }
 
-        $rules = $data['rule'];
+//        $rules = $data['rule'];
 
         $member_id = $data['member_id'];
 
@@ -486,8 +506,24 @@ class RulesController extends Controller
                 ]);
             }
 
-
+            //ПРЕОБРАЗОВАНИЕ ЗАПРОСА
+//            [ {"field_id": {"id": "2"}, "rule":{"rule_id":"3"}, "text": "abc"}]
+//            В
+//            [ { "id": "2", "rule": "3", "text": "abc" }]
+            $upd_rules = [];
             foreach ($rules as $rule) {
+                $field_rule_id = $rule->field_id->id;
+                $rule_rule_id = $rule->rule->rule_id;
+                $text = $rule->text;
+                $upd_rules[] = (object)[
+                    'id' => $field_rule_id,
+                    'rule' => $rule_rule_id,
+                    'text' => $text,
+                ];
+            }
+//END
+
+            foreach ($upd_rules as $rule) {
 
                 $field_val = Field::find($rule->id);
 
@@ -529,7 +565,7 @@ class RulesController extends Controller
             ], [
                 'field_id' => $field->field_id,
                 'CRM_TYPE' => "CRM_COMPANY",
-                'rule' => json_encode($rules),
+                'rule' => json_encode($upd_rules),
                 'rule_type' => $rule_type,
                 'show' => $data['show'] ?? 0,
                 'member_id' => $member_id,
@@ -556,7 +592,7 @@ class RulesController extends Controller
     }
 
     /**
-     * УДАЛЕНИЕ БЛОКА ПО ИНДЕКС
+     * УДАЛЕНИЕ БЛОКОВ ПРАВИЛ
      */
     public function destroyblock(ShowRequest $request, string $id)
     {
@@ -593,7 +629,6 @@ class RulesController extends Controller
                 'messages' => 'RuleBLOCK is not found',
             ]);
         }
-
     }
 
 }

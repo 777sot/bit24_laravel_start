@@ -66,6 +66,8 @@ Route::patch('/leads/values/{id}', [\App\Http\Controllers\Api\Leads\ValuesContro
 Route::get('/leads/values/{id}', [\App\Http\Controllers\Api\Leads\ValuesController::class, 'show'])->name('leads.values.show');
 //УДАЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ ЛИДА
 Route::delete('/leads/values/{field}', [\App\Http\Controllers\Api\Leads\ValuesController::class, 'destroy'])->name('leads.values.destroy');
+//TODO ПЕРДПРОСМОТР ДЛЯ ЛИДА
+Route::post('/leads/values_view', [\App\Http\Controllers\Api\Leads\ValuesController::class, 'store_view'])->name('leads.values.store_view');
 //-----------
 //----------------
 
@@ -116,6 +118,8 @@ Route::patch('/contacts/values/{id}', [\App\Http\Controllers\Api\Contact\ValuesC
 Route::get('/contacts/values/{id}', [\App\Http\Controllers\Api\Contact\ValuesController::class, 'show'])->name('contacts.values.show');
 //УДАЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ КОНТАКТА
 Route::delete('/contacts/values/{field}', [\App\Http\Controllers\Api\Contact\ValuesController::class, 'destroy'])->name('contacts.values.destroy');
+//TODO ПЕРДПРОСМОТР ДЛЯ КОНТАКТА
+Route::post('/contacts/values_view', [\App\Http\Controllers\Api\Contact\ValuesController::class, 'store_view'])->name('contacts.values.store_view');
 //-----------
 //-----------
 
@@ -166,6 +170,8 @@ Route::patch('/company/values/{id}', [\App\Http\Controllers\Api\Company\ValuesCo
 Route::get('/company/values/{id}', [\App\Http\Controllers\Api\Company\ValuesController::class, 'show'])->name('company.values.show');
 //УДАЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ КОМПАНИИ
 Route::delete('/company/values/{field}', [\App\Http\Controllers\Api\Company\ValuesController::class, 'destroy'])->name('company.values.destroy');
+//TODO ПЕРДПРОСМОТР ДЛЯ КОМПАНИИ
+Route::post('/company/values_view', [\App\Http\Controllers\Api\Company\ValuesController::class, 'store_view'])->name('company.values.store_view');
 //-----------
 //-----------
 
@@ -217,6 +223,8 @@ Route::patch('/deal/values/{id}', [\App\Http\Controllers\Api\Deal\ValuesControll
 Route::get('/deal/values/{id}', [\App\Http\Controllers\Api\Deal\ValuesController::class, 'show'])->name('deal.values.show');
 //УДАЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ СДЕЛКИ
 Route::delete('/deal/values/{field}', [\App\Http\Controllers\Api\Deal\ValuesController::class, 'destroy'])->name('deal.values.destroy');
+//TODO ПЕРДПРОСМОТР ДЛЯ СДЕЛКИ
+Route::post('/deal/values_view', [\App\Http\Controllers\Api\Deal\ValuesController::class, 'store_view'])->name('deal.values.store_view');
 //-----------
 
 //TODO ПРАВИЛА ДЛЯ ПРЕДЛОЖЕНИЯ
@@ -265,6 +273,8 @@ Route::patch('/quote/values/{id}', [\App\Http\Controllers\Api\Quote\ValuesContro
 Route::get('/quote/values/{id}', [\App\Http\Controllers\Api\Quote\ValuesController::class, 'show'])->name('quote.values.show');
 //УДАЛЕНИЕ ЗНАЧЕНИЙ ДЛЯ ПРЕДЛОЖЕНИЯ
 Route::delete('/quote/values/{field}', [\App\Http\Controllers\Api\Quote\ValuesController::class, 'destroy'])->name('quote.values.destroy');
+//TODO ПЕРДПРОСМОТР ДЛЯ ПРЕДЛОЖЕНИЯ
+Route::post('/quote/values_view', [\App\Http\Controllers\Api\Quote\ValuesController::class, 'store_view'])->name('quote.values.store_view');
 //-----------
 
 ////TODO ЗАВИСИМОСТИ СПИСКОВ ДЛЯ ЛИДА

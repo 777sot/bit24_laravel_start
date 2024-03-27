@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 class FieldsController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * ВЫВОД СПИСКА ПОЛЕЙ
      */
     public function index(ShowRequest $request)
     {
@@ -30,7 +30,7 @@ class FieldsController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * ДОБАВЛЕНИЕ ПОЛЕЙ
      */
     public function store(StoreRequest $request)
     {
@@ -126,7 +126,7 @@ class FieldsController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * ВЫВОД ПОЛЯ ПО ID
      */
     public function show(ShowRequest $request, string $id)
     {
@@ -156,7 +156,7 @@ class FieldsController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * ОБНОВЛЕНИЕ ПОЛЯ
      */
     public function update(UpdateRequest $request, string $id)
     {
@@ -247,7 +247,7 @@ class FieldsController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * УДАЛЕНИЕ ПОЛЯ
      */
     public function destroy(ShowRequest $request, string $id)
     {
@@ -312,7 +312,7 @@ class FieldsController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * ОБНОВЛЕНИЕ ИНДЕКСОВ ПОЛЕЙ
      */
     public function update_index(Request $request)
     {
