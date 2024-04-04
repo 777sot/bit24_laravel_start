@@ -191,7 +191,9 @@ class Services
         return $fields;
     }
 
-
+    /**
+     * TODO ПРОВЕРКА ПРАВИЛ
+     */
     public static function checkLeadsFields($data)
     {
         $rules = Rule::where('CRM_TYPE', $data['CRM_TYPE'])
@@ -216,19 +218,11 @@ class Services
                 $result[] = Services::checkFieldsThree($data, $rule);
             }
         }
-//  $result = [];
-//        foreach ($rules as $rule) {
-//            if ($rule->rule_type == 1) {
-//                $result = [...$result, ...Services::checkFieldsOne($data, $rule)];
-//            } elseif ($rule->rule_type == 2) {
-//                $result =  [...$result, ...Services::checkFieldsTwo($data, $rule)];
-//            } elseif ($rule->rule_type == 3) {
-//                [...$result, ...Services::checkFieldsThree($data, $rule)];
-//            }
-//        }
         return $result;
     }
-
+    /**
+     * TODO ПРОВЕРКА ПРАВИЛА ДЛЯ ПОЛЯ
+     */
     public static function checkFields($data, $rule, $rule_field)
     {
         $result = [];
@@ -368,7 +362,9 @@ class Services
 
         return $result;
     }
-
+    /**
+     * TODO ПРОВЕРКА ПРАВИЛА 1 Разные значения полей управляют разными полями
+     */
     public static function checkFieldsOne($data, $rule)
     {
 
@@ -392,7 +388,9 @@ class Services
 
         return $data_fresh;
     }
-
+    /**
+     * TODO ПРОВЕРКА ПРАВИЛА 2 Разные значения полей управляют одними полями
+     */
     public static function checkFieldsTwo($data, $rule)
     {
         $data_fresh = [];
@@ -417,7 +415,9 @@ class Services
         return $data_fresh;
 
     }
-
+    /**
+     * TODO ПРОВЕРКА ПРАВИЛА 3 Совокупность значений управляет одними полями
+     */
     public static function checkFieldsThree($data, $rule)
     {
         $data_fresh = [];
@@ -442,7 +442,9 @@ class Services
 
         return $data_fresh;
     }
-
+    /**
+     * УСЛОЫВИЯ ПРАВИЛ
+     */
     public static function rules_fields($id_num = null)
     {
         $rules_fields = [
@@ -460,7 +462,9 @@ class Services
 
         return array_search($id_num, $rules_fields);
     }
-
+    /**
+     * ТИПЫ ПОЛЕЙ
+     */
     public static function type_fields($type_field = null)
     {
         $type = [
@@ -474,7 +478,9 @@ class Services
 
         return $type;
     }
-
+    /**
+     * ТИПЫ ПРАВИЛ
+     */
     public static function rule_type($type_rule = null)
     {
         $type = [

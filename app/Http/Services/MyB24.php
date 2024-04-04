@@ -9,12 +9,11 @@ use Illuminate\Support\Facades\Http;
 class MyB24
 {
     /**
-     * Can overridden this method to change the data storage location.
-     *
-     * @return array setting for getAppSettings()
+     * TODO УСТАНОВКА ПРИЛОЖЕНИЯ БИТРИКС
      */
     public static function installApp(Request $request)
     {
+        //ПОЛУЧЕМ ПЕРЕМЕННЫЕ ДЛЯ УСТАНОВКИ БИТРИКС
         $domain = $request->input('DOMAIN');
         $auth_id = $request->input('AUTH_ID');
         $plasement = $request->input('PLACEMENT');
@@ -28,9 +27,10 @@ class MyB24
             'rest_only' => true,
             'install' => false
         ];
-
         if ($event == 'ONAPPINSTALL' && !empty($auth_id)) {
+
             $result['install'] = static::setAppSettings($auth_id, true);
+
         } elseif ($plasement == 'DEFAULT') {
             $result['rest_only'] = false;
             $result['install'] = static::setAppSettings(
@@ -44,7 +44,7 @@ class MyB24
                 ],
                 true
             );
-
+            //ДОБАВЛЯЕМ В БД НАСТРОЙКИ ПОЛЬЗОВАТЕЛЯ БИТРИКС
             Setting::updateOrCreate([
                 'member_id' => htmlspecialchars($member_id)
             ], [
@@ -57,16 +57,11 @@ class MyB24
                 'client_endpoint' => 'https://' . htmlspecialchars($domain) . '/rest/',
             ]);
         }
-
-//        static::setLog(
-//            [
-//                'request' => $request->all(),
-//                'result' => $result
-//            ],
-//            'installApp'
-//        );
         return $result;
     }
+    /**
+     * TODO ПОЛУЧЕМ ЗНАЧЕНИЯ CLIENT_ID И CLIENT_SECRET ИЗ ФАЙЛА .ENV
+     */
     public static function getSettingData()
     {
         $return = [];
@@ -78,11 +73,8 @@ class MyB24
     }
 
     /**
-     * @return boolean
-     * @var $isInstall  boolean true if install app by installApp()
-     * @var $arSettings array settings application
+     * TODO НАСТРОЙКИ ИНСТАЛЯЦИИ БИТРИКС
      */
-
     private static function setAppSettings($arSettings, $isInstall = false)
     {
         $return = false;
@@ -97,40 +89,33 @@ class MyB24
     }
 
     /**
-     * Can overridden this method to change the data storage location.
-     *
-     * @return boolean is successes save data for setSettingData()
-     * @var $arSettings array settings application
+     * МЕТОД ИСПОЛЬЗУЕТСЯ ПРИ УСТАНОВКЕ, СОЗДАЕТ ФАЙЛ /settings.json
      */
-
     protected static function setSettingData($arSettings)
     {
-        return (boolean)file_put_contents(__DIR__ . '/settings.json', static::wrapData($arSettings));
+        return true;
+//        return (boolean)file_put_contents(__DIR__ . '/settings.json', static::wrapData($arSettings));
     }
 
     /**
-     * @return string json_encode with encoding
-     * @var $debag boolean
-     *
-     * @var $data mixed
+     * МЕТОД ИСПОЛЬЗУЕТСЯ ПРИ УСТАНОВКЕ
      */
     protected static function wrapData($data, $debag = false)
     {
-        if (defined(env('C_REST_CURRENT_ENCODING'))) {
-            $data = static::changeEncoding($data, true);
-        }
+//        if (defined(env('C_REST_CURRENT_ENCODING'))) {
+//            $data = static::changeEncoding($data, true);
+//        }
         $return = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
-
 
         return $return;
     }
 
     /**
-     * @return mixed setting application for query
+     * TODO ПОЛУЧЕМ НАСТРОЙКИ ИНСТАЛЯЦИИ БИТРИКС
      */
-
     public static function getAppSettings()
     {
+        //ПОЛУЧЕМ ДАННЫЕ ИЗ УСТАНОВОЧНЫХ ПЕРЕМЕННЫХ БИТРИКС
         if (defined(env("C_REST_WEB_HOOK_URL")) && !empty(env("C_REST_WEB_HOOK_URL"))) {
             $arData = [
                 'client_endpoint' => env("C_REST_WEB_HOOK_URL"),
@@ -356,7 +341,9 @@ class MyB24
             ]);
         return $response;
     }
-
+    /**
+     * TODO ВСТРОЙКА ВИДЖЕТА
+     */
     static function placementCallB24(Request $request, $method)
     {
         $domain = $request->input('DOMAIN');
@@ -487,6 +474,9 @@ class MyB24
         return $response->json();
     }
 
+    /**
+     * TODO ОБНОВЛЕНИЕ ТОКЕНА В БИТРИКС
+     */
     static function CallB24_refresh_token($member_id)
     {
         $member = Setting::where('member_id', $member_id)->first();
@@ -520,7 +510,9 @@ class MyB24
         $member->update($result);
         return true;
     }
-
+    /**
+     * TODO ДОБАВЛЕНИЕ ПОЛЕЙ ТЕКСТ В БИТРИКС
+     */
     static function CallB24_field_text_add_new($crm_type, $add)
     {
         $res = MyB24::CallB24_refresh_token($add["member_id"]);
@@ -619,7 +611,9 @@ class MyB24
 
         return $response->json();
     }
-
+    /**
+     * TODO ДОБАВЛЕНИЕ ПОЛЕЙ СПИСКА В БИТРИКС
+     */
     static function CallB24_field_enumeration_add_new($crm_type, $add = [])
     {
 
@@ -727,7 +721,9 @@ class MyB24
 
         return $response->json();
     }
-
+    /**
+     * TODO ДОБАВЛЕНИЕ ПОЛЕЙ ТЕКСТ В БИТРИКС
+     */
     static function CallB24_field_text_upd_new($crm_type, $update)
     {
         $data = Setting::where('member_id', $update['member_id'])->first();
@@ -780,7 +776,9 @@ class MyB24
 
         return $response->json();
     }
-
+    /**
+     * TODO ОБНОВЛЕНИЕ ПОЛЕЙ СПИСКА В БИТРИКС
+     */
     static function CallB24_field_enumeration_upd_new($crm_type, $update, $ID_del)
     {
         $data = Setting::where('member_id', $update['member_id'])->first();
@@ -884,7 +882,9 @@ class MyB24
 
         return $response->json();
     }
-
+    /**
+     * TODO ПОЛУЧЕНИЕ СПИСКА ПОЛЕЙ СПИСКА В БИТРИКС ПО $XML_ID
+     */
     static function CallB24_field_list(Request $request, $crm_type, $XML_ID = null)
     {
         $data = $request->input();
@@ -931,7 +931,9 @@ class MyB24
 
         return $response->json();
     }
-
+    /**
+     * TODO ДОБАВЛЕНИЕ ПОЛЕЙ ЛИСТ В БИТРИКС
+     */
     static function CallB24_field_list_new($crm_type, $member_id, $ID)
     {
         $res = MyB24::CallB24_refresh_token($member_id);
@@ -1023,6 +1025,9 @@ class MyB24
         return $response->json();
     }
 
+    /**
+     * TODO УДАЛЕНИЕ ПОЛЯ В БИТРИКС
+     */
     static function CallB24_field_del_new($crm_type, $member_id, $ID)
     {
         $res = MyB24::CallB24_refresh_token($member_id);

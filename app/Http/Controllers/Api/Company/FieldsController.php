@@ -243,7 +243,6 @@ class FieldsController extends Controller
                 'messages' => 'Field is not found',
             ]);
         }
-
     }
 
     /**

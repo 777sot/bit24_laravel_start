@@ -18,7 +18,7 @@ class IndexController extends Controller
 
     public function index(Request $request)
     {
-
+        dd(111);
         //ДОБАВЛЕНИЕ ПОЛЯ ТЕКСТ
         $add = [];
         $add["FIELD_NAME"] = "MY_STROKA_TEST";
@@ -44,11 +44,11 @@ class IndexController extends Controller
 //        $upd_field_text = MyB24::CallB24_field_enumeration_upd($request,  "CRM_LEAD", 'MY_LIST_TEST', $update);
 //        dd($upd_field_text);
         //УДАЛЕНИЕ ПОЛЯ В БИТРИКС
-        $del_field = MyB24::CallB24_field_del($request, "CRM_LEAD", 'STRING_8');
+//        $del_field = MyB24::CallB24_field_del($request, "CRM_LEAD", 'STRING_8');
 //        dd($del_field);
         //СПИСОК ПОЛЬЗОВАТЕЛЬСКИХ ПОЛЕЙ СПИСОК
-        $usr_field_list = MyB24::CallB24_field_list($request, "CRM_LEAD",);
-        dd($usr_field_list);
+//        $usr_field_list = MyB24::CallB24_field_list($request, "CRM_LEAD",);
+//        dd($usr_field_list);
         //ДОБАВЛЕНИЕ ПОЛЯ СПИСОК
 
         //ДОБАВЛЕНИЕ ПОЛЯ СПИСОК (МНОЖЕСТВЕННЫЙ)
@@ -161,21 +161,23 @@ class IndexController extends Controller
 
     public function install(Request $request)
     {
-
+        //ИНСТАЛЯЦИЯ ПРИЛОЖЕНИЯ
         $install_result = MyB24::installApp($request);
-
+        //ДОБАВЛЯЕМ ВСТРОЕННЫЙ ВИДЖЕТ
         $result = MyB24::placementCallB24($request, 'userfieldtype.add');
+
+
 //
 //        dd($result);
 //        $result = MyB24::placementCallB24_list($request, 'userfieldtype.list');
 //
 //        dd($result);
-        $result_bind = MyB24::bindCallB24($request, 'event.bind', 'ONCRMLEADADD');
-        $result_bind_2 = MyB24::bindCallB24($request, 'event.bind', 'ONCRMLEADUPDATE');
+//        $result_bind = MyB24::bindCallB24($request, 'event.bind', 'ONCRMLEADADD');
+//        $result_bind_2 = MyB24::bindCallB24($request, 'event.bind', 'ONCRMLEADUPDATE');
 
-        Log::info($result);
-        Log::info($result_bind);
-        Log::info($result_bind_2);
+//        Log::info($result);
+//        Log::info($result_bind);
+//        Log::info($result_bind_2);
 
 
 //        $result = CRest::call(
